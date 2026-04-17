@@ -1,0 +1,59 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="XStore - Tu catálogo de productos anime, manga, figuras y más">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>{% block title %}XStore{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'catalogo/css/style.css' %}">
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% csrf_token %}
+
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="{% url 'catalogo:index' %}" class="navbar-brand">
+                <span class="brand-x">X</span><span class="brand-store">Store</span>
+            </a>
+
+            <ul class="navbar-nav">
+                <li><a href="{% url 'catalogo:index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
+                <li><a href="{% url 'catalogo:catalogo' %}" class="{% if request.resolver_match.url_name == 'catalogo' %}active{% endif %}">Catálogo</a></li>
+            </ul>
+
+            <div class="navbar-actions">
+                <a href="{% url 'catalogo:ver_carrito' %}" class="btn-cart" id="btn-cart-nav">
+                    <span class="cart-icon">🛒</span>
+                    <span class="cart-text">Carrito</span>
+                    <span class="cart-badge" id="cart-badge">0</span>
+                </a>
+                <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Menu">☰</button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <span class="brand-x">X</span>Store
+            </div>
+            <span class="footer-text">© 2026 XStore · Catálogo de productos</span>
+            <div class="footer-links">
+                <a href="{% url 'catalogo:index' %}">Inicio</a>
+                <a href="{% url 'catalogo:catalogo' %}">Catálogo</a>
+                <a href="{% url 'catalogo:ver_carrito' %}">Carrito</a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="{% static 'catalogo/js/cart.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

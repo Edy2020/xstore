@@ -1,0 +1,124 @@
+{% extends "catalogo/base.html" %}
+
+{% block title %}{{ producto.nombre }} · XStore{% endblock %}
+
+{% block content %}
+<div class="container detail-container">
+    <div class="detail-breadcrumb">
+        <a href="{% url 'catalogo:index' %}">Inicio</a>
+        <span class="separator">›</span>
+        <a href="{% url 'catalogo:catalogo' %}">Catálogo</a>
+        <span class="separator">›</span>
+        <a href="{% url 'catalogo:catalogo' %}?categoria={{ producto.categoria }}">{{ producto.categoria }}</a>
+        <span class="separator">›</span>
+        <span>{{ producto.nombre }}</span>
+    </div>
+
+    <div class="detail-grid">
+        <div class="detail-image" style="background: linear-gradient(135deg, {{ producto.categoria_color }}12, {{ producto.categoria_color }}04);">
+            <span>{{ producto.categoria_icono }}</span>
+        </div>
+
+        <div class="detail-info">
+            <span class="detail-category">{{ producto.categoria_icono }} {{ producto.categoria }}</span>
+
+            <h1 class="detail-name">{{ producto.nombre }}</h1>
+
+            {% if producto.descripcion %}
+            <p class="detail-description">{{ producto.descripcion }}</p>
+            {% endif %}
+
+            <div class="detail-price">{{ producto.precio_formateado }}</div>
+
+            <div class="detail-stock">
+                {% if producto.tiene_stock %}
+                    {% if producto.stock_bajo %}
+                    <span class="stock-dot low"></span>
+                    <span style="color: var(--warning);">¡Solo quedan {{ producto.stock }} unidades!</span>
+                    {% else %}
+                    <span class="stock-dot"></span>
+                    <span style="color: var(--success);">{{ producto.stock }} unidades disponibles</span>
+                    {% endif %}
+                {% else %}
+                    <span class="stock-dot out"></span>
+                    <span style="color: var(--danger);">Producto agotado</span>
+                {% endif %}
+            </div>
+
+            {% if producto.tiene_stock %}
+            <div class="detail-cart-form">
+                <div class="qty-selector">
+                    <button type="button" onclick="changeDetailQty(-1)">−</button>
+                    <input type="number" id="qty-{{ producto.id }}" value="1" min="1" max="{{ producto.stock }}" readonly>
+                    <button type="button" onclick="changeDetailQty(1)">+</button>
+                </div>
+                <button class="btn btn-primary detail-add-btn js-add-cart"
+                        data-product-id="{{ producto.id }}">
+                    🛒 Agregar al carrito
+                </button>
+            </div>
+            {% else %}
+            <button class="btn btn-secondary" disabled style="opacity: 0.5; cursor: not-allowed;">
+                Producto agotado
+            </button>
+            {% endif %}
+
+            {% if producto.proveedor %}
+            <div style="padding-top: 1rem; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.85rem;">
+                Proveedor: {{ producto.proveedor.nombre }}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% if relacionados %}
+<div class="container related-section">
+    <div class="section-header">
+        <div>
+            <h2 class="section-title">Productos relacionados</h2>
+            <p class="section-subtitle">Más productos de {{ producto.categoria }}</p>
+        </div>
+    </div>
+    <div class="products-grid">
+        {% for rel in relacionados %}
+        <div class="product-card animate-in">
+            <a href="{% url 'catalogo:detalle' rel.id %}">
+                <div class="product-image" style="background: linear-gradient(135deg, {{ rel.categoria_color }}15, {{ rel.categoria_color }}05);">
+                    <span>{{ rel.categoria_icono }}</span>
+                </div>
+            </a>
+            <div class="product-info">
+                <span class="product-category">{{ rel.categoria_icono }} {{ rel.categoria }}</span>
+                <h3 class="product-name">
+                    <a href="{% url 'catalogo:detalle' rel.id %}">{{ rel.nombre }}</a>
+                </h3>
+                <div class="product-footer">
+                    <span class="product-price">{{ rel.precio_formateado }}</span>
+                    {% if rel.tiene_stock %}
+                    <button class="btn-add-cart js-add-cart" data-product-id="{{ rel.id }}">🛒 Agregar</button>
+                    {% else %}
+                    <button class="btn-add-cart" disabled>Agotado</button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function changeDetailQty(delta) {
+    const input = document.querySelector('[id^="qty-"]');
+    if (!input) return;
+    let val = parseInt(input.value) + delta;
+    const max = parseInt(input.max) || 99;
+    if (val < 1) val = 1;
+    if (val > max) val = max;
+    input.value = val;
+}
+</script>
+{% endblock %}
