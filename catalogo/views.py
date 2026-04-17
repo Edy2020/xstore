@@ -11,6 +11,29 @@ def _format_price(value):
     return f"${value:,.0f}".replace(",", ".")
 
 
+def buscar_live(request):
+    query = request.GET.get('q', '').strip()
+    if len(query) < 2:
+        return JsonResponse({'productos': []})
+
+    productos = Productos.objects.filter(
+        Q(nombre__icontains=query) | Q(descripcion__icontains=query),
+        estado='activo'
+    ).order_by('-stock', 'nombre')[:6]
+
+    results = []
+    for p in productos:
+        results.append({
+            'id': p.id,
+            'nombre': p.nombre,
+            'precio': p.precio_formateado,
+            'imagen': p.imagen_url if p.tiene_imagen else None,
+            'url': f'/producto/{p.id}/'  # URL directa para evitar reverse innecesario en loop
+        })
+
+    return JsonResponse({'productos': results})
+
+
 def index(request):
     productos_activos = Productos.objects.filter(estado='activo')
 

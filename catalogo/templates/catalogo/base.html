@@ -25,6 +25,14 @@
                 <li><a href="{% url 'catalogo:catalogo' %}" class="{% if request.resolver_match.url_name == 'catalogo' %}active{% endif %}">Catálogo</a></li>
             </ul>
 
+            <div class="nav-search" id="nav-search-container">
+                <div class="search-input-wrapper">
+                    <svg class="icon icon-sm"><use xlink:href="#icon-search"></use></svg>
+                    <input type="text" id="live-search-input" placeholder="Buscar productos..." autocomplete="off">
+                </div>
+                <div class="search-results-dropdown" id="live-search-results"></div>
+            </div>
+
             <div class="navbar-actions">
                 <a href="{% url 'catalogo:ver_carrito' %}" class="btn-cart" id="btn-cart-nav">
                     <svg class="icon"><use xlink:href="#icon-cart"></use></svg>
@@ -57,6 +65,7 @@
     </footer>
 
     <script src="{% static 'catalogo/js/cart.js' %}"></script>
+    <script src="{% static 'catalogo/js/search.js' %}"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
