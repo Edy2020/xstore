@@ -4,8 +4,8 @@
 
 {% block content %}
 <div class="container cart-container">
-    <h1 class="cart-title">🛒 Carrito de compras</h1>
-    <p class="cart-subtitle"><span id="cart-items-count">{{ items|length }}</span> producto{{ items|length|pluralize:"s" }} en tu carrito</p>
+    <h1 class="cart-title">Carrito</h1>
+    <p class="cart-subtitle"><span id="cart-items-count">{{ items|length }}</span> producto{{ items|length|pluralize:"s" }} actual{{ items|length|pluralize:"mente," }} en tu selección</p>
 
     {% if items %}
     <div class="cart-layout">
@@ -13,19 +13,27 @@
             {% for item in items %}
             <div class="cart-item" id="cart-item-{{ item.id }}">
                 <div class="cart-item-image">
-                    {{ item.icono }}
+                    {% if item.imagen %}
+                    <img src="/media/{{ item.imagen }}" alt="{{ item.nombre }}">
+                    {% else %}
+                    <svg class="icon"><use xlink:href="#icon-package"></use></svg>
+                    {% endif %}
                 </div>
                 <div class="cart-item-info">
                     <div class="cart-item-name">
                         <a href="{% url 'catalogo:detalle' item.id %}">{{ item.nombre }}</a>
                     </div>
-                    <div class="cart-item-price">{{ item.precio_formateado }} c/u</div>
+                    <div class="cart-item-price">{{ item.precio_formateado }}</div>
                 </div>
                 <div class="cart-item-qty">
                     <div class="qty-selector">
-                        <button type="button" class="js-qty-minus" data-product-id="{{ item.id }}">−</button>
+                        <button type="button" class="js-qty-minus" data-product-id="{{ item.id }}">
+                            <svg class="icon icon-sm"><use xlink:href="#icon-minus"></use></svg>
+                        </button>
                         <input type="number" id="cart-qty-{{ item.id }}" value="{{ item.cantidad }}" min="1" readonly>
-                        <button type="button" class="js-qty-plus" data-product-id="{{ item.id }}">+</button>
+                        <button type="button" class="js-qty-plus" data-product-id="{{ item.id }}">
+                            <svg class="icon icon-sm"><use xlink:href="#icon-plus"></use></svg>
+                        </button>
                     </div>
                 </div>
                 <div class="cart-item-subtotal" id="subtotal-{{ item.id }}">
@@ -33,7 +41,7 @@
                 </div>
                 <div class="cart-item-remove">
                     <button class="btn btn-icon btn-danger js-remove-item" data-product-id="{{ item.id }}" title="Eliminar">
-                        ✕
+                        <svg class="icon icon-sm"><use xlink:href="#icon-trash"></use></svg>
                     </button>
                 </div>
             </div>
@@ -41,9 +49,9 @@
         </div>
 
         <div class="cart-summary">
-            <h3>Resumen del pedido</h3>
+            <h3>Resumen</h3>
             <div class="summary-row">
-                <span class="label">Productos ({{ items|length }})</span>
+                <span class="label">Subtotal</span>
                 <span id="cart-subtotal">{{ total_formateado }}</span>
             </div>
             <div class="summary-row total">
@@ -51,22 +59,28 @@
                 <span class="value" id="cart-total">{{ total_formateado }}</span>
             </div>
             <div class="cart-summary-actions">
-                <a href="{% url 'catalogo:checkout' %}" class="btn btn-primary">💳 Proceder al pago</a>
-                <a href="{% url 'catalogo:catalogo' %}" class="btn btn-secondary">← Seguir comprando</a>
-                <button class="btn btn-danger btn-sm js-clear-cart">🗑️ Vaciar carrito</button>
+                <a href="{% url 'catalogo:checkout' %}" class="btn btn-primary">
+                    <svg class="icon icon-sm"><use xlink:href="#icon-credit-card"></use></svg>
+                    Proceder al pago
+                </a>
+                <a href="{% url 'catalogo:catalogo' %}" class="btn btn-secondary">
+                    <svg class="icon icon-sm"><use xlink:href="#icon-arrow-left"></use></svg>
+                    Seguir explorando
+                </a>
+                <button class="js-clear-cart btn-danger btn-sm" style="margin-top: 1rem; opacity: 0.6; width: 100%;">
+                    Vaciar carrito
+                </button>
             </div>
         </div>
     </div>
 
     {% else %}
-
     <div class="cart-empty">
-        <div class="cart-empty-icon">🛒</div>
+        <svg class="icon"><use xlink:href="#icon-cart"></use></svg>
         <h3>Tu carrito está vacío</h3>
-        <p>Explora nuestro catálogo y agrega productos que te gusten.</p>
-        <a href="{% url 'catalogo:catalogo' %}" class="btn btn-primary">Explorar catálogo →</a>
+        <p>Explora nuestro catálogo y selecciona los productos que necesites.</p>
+        <a href="{% url 'catalogo:catalogo' %}" class="btn btn-primary">Ir al catálogo</a>
     </div>
-
     {% endif %}
 </div>
 {% endblock %}

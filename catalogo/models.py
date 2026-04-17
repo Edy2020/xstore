@@ -26,6 +26,7 @@ class Productos(models.Model):
     id = models.BigAutoField(primary_key=True)
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField(blank=True, null=True)
+    imagen = models.CharField(max_length=255, blank=True, null=True)
     categoria = models.CharField(max_length=255, blank=True, null=True)
     precio = models.BigIntegerField()
     stock = models.IntegerField()
@@ -35,26 +36,6 @@ class Productos(models.Model):
     proveedor = models.ForeignKey(
         Proveedores, models.DO_NOTHING, blank=True, null=True
     )
-
-    CATEGORIA_ICONOS = {
-        'Manga': '📚',
-        'Figura': '🎭',
-        'Figuras': '🎭',
-        'Ropa': '👕',
-        'Accesorios': '🎒',
-        'Decoración': '🖼️',
-        'Papelería': '✏️',
-    }
-
-    CATEGORIA_COLORES = {
-        'Manga': '#e74c8a',
-        'Figura': '#8b5cf6',
-        'Figuras': '#8b5cf6',
-        'Ropa': '#3b82f6',
-        'Accesorios': '#f59e0b',
-        'Decoración': '#10b981',
-        'Papelería': '#ef4444',
-    }
 
     class Meta:
         managed = False
@@ -76,12 +57,14 @@ class Productos(models.Model):
         return 0 < self.stock <= 5
 
     @property
-    def categoria_icono(self):
-        return self.CATEGORIA_ICONOS.get(self.categoria, '📦')
+    def imagen_url(self):
+        if self.imagen:
+            return f'/media/{self.imagen}'
+        return None
 
     @property
-    def categoria_color(self):
-        return self.CATEGORIA_COLORES.get(self.categoria, '#6366f1')
+    def tiene_imagen(self):
+        return bool(self.imagen)
 
 
 class Ventas(models.Model):

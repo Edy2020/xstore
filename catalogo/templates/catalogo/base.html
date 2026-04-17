@@ -4,19 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="XStore - Tu catálogo de productos anime, manga, figuras y más">
+    <meta name="description" content="XStore - Tu catálogo premium de productos">
     <meta name="csrf-token" content="{{ csrf_token }}">
     <title>{% block title %}XStore{% endblock %}</title>
     <link rel="stylesheet" href="{% static 'catalogo/css/style.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
 <body>
+    {% include "catalogo/_icons.html" %}
     {% csrf_token %}
 
     <nav class="navbar">
         <div class="navbar-inner">
             <a href="{% url 'catalogo:index' %}" class="navbar-brand">
-                <span class="brand-x">X</span><span class="brand-store">Store</span>
+                <span class="brand-x">X</span><span>Store</span>
             </a>
 
             <ul class="navbar-nav">
@@ -26,11 +27,13 @@
 
             <div class="navbar-actions">
                 <a href="{% url 'catalogo:ver_carrito' %}" class="btn-cart" id="btn-cart-nav">
-                    <span class="cart-icon">🛒</span>
-                    <span class="cart-text">Carrito</span>
+                    <svg class="icon"><use xlink:href="#icon-cart"></use></svg>
+                    <span>Carrito</span>
                     <span class="cart-badge" id="cart-badge">0</span>
                 </a>
-                <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Menu">☰</button>
+                <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Menu">
+                    <svg class="icon"><use xlink:href="#icon-menu"></use></svg>
+                </button>
             </div>
         </div>
     </nav>

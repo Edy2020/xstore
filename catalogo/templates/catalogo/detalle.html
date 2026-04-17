@@ -1,4 +1,5 @@
 {% extends "catalogo/base.html" %}
+{% load static %}
 
 {% block title %}{{ producto.nombre }} · XStore{% endblock %}
 
@@ -6,21 +7,28 @@
 <div class="container detail-container">
     <div class="detail-breadcrumb">
         <a href="{% url 'catalogo:index' %}">Inicio</a>
-        <span class="separator">›</span>
+        <span class="separator">/</span>
         <a href="{% url 'catalogo:catalogo' %}">Catálogo</a>
-        <span class="separator">›</span>
-        <a href="{% url 'catalogo:catalogo' %}?categoria={{ producto.categoria }}">{{ producto.categoria }}</a>
-        <span class="separator">›</span>
+        <span class="separator">/</span>
         <span>{{ producto.nombre }}</span>
     </div>
 
     <div class="detail-grid">
-        <div class="detail-image" style="background: linear-gradient(135deg, {{ producto.categoria_color }}12, {{ producto.categoria_color }}04);">
-            <span>{{ producto.categoria_icono }}</span>
+        <div class="detail-image">
+            {% if producto.tiene_imagen %}
+            <img src="{{ producto.imagen_url }}" alt="{{ producto.nombre }}" class="detail-img">
+            {% else %}
+            <div class="detail-img-placeholder">
+                <svg class="icon"><use xlink:href="#icon-package"></use></svg>
+            </div>
+            {% endif %}
         </div>
 
         <div class="detail-info">
-            <span class="detail-category">{{ producto.categoria_icono }} {{ producto.categoria }}</span>
+            <div class="detail-category">
+                <svg class="icon icon-sm"><use xlink:href="#icon-tag"></use></svg>
+                {{ producto.categoria|default:"Producto" }}
+            </div>
 
             <h1 class="detail-name">{{ producto.nombre }}</h1>
 
@@ -31,40 +39,40 @@
             <div class="detail-price">{{ producto.precio_formateado }}</div>
 
             <div class="detail-stock">
-                {% if producto.tiene_stock %}
-                    {% if producto.stock_bajo %}
-                    <span class="stock-dot low"></span>
-                    <span style="color: var(--warning);">¡Solo quedan {{ producto.stock }} unidades!</span>
+                <span class="stock-dot {% if producto.stock_bajo %}low{% elif not producto.tiene_stock %}out{% endif %}"></span>
+                <span class="{% if not producto.tiene_stock %}out{% elif producto.stock_bajo %}low{% endif %}">
+                    {% if producto.tiene_stock %}
+                        {{ producto.stock }} unidades disponibles
                     {% else %}
-                    <span class="stock-dot"></span>
-                    <span style="color: var(--success);">{{ producto.stock }} unidades disponibles</span>
+                        Producto agotado
                     {% endif %}
-                {% else %}
-                    <span class="stock-dot out"></span>
-                    <span style="color: var(--danger);">Producto agotado</span>
-                {% endif %}
+                </span>
             </div>
 
             {% if producto.tiene_stock %}
             <div class="detail-cart-form">
                 <div class="qty-selector">
-                    <button type="button" onclick="changeDetailQty(-1)">−</button>
+                    <button type="button" onclick="changeDetailQty(-1)">
+                        <svg class="icon icon-sm"><use xlink:href="#icon-minus"></use></svg>
+                    </button>
                     <input type="number" id="qty-{{ producto.id }}" value="1" min="1" max="{{ producto.stock }}" readonly>
-                    <button type="button" onclick="changeDetailQty(1)">+</button>
+                    <button type="button" onclick="changeDetailQty(1)">
+                        <svg class="icon icon-sm"><use xlink:href="#icon-plus"></use></svg>
+                    </button>
                 </div>
                 <button class="btn btn-primary detail-add-btn js-add-cart"
                         data-product-id="{{ producto.id }}">
-                    🛒 Agregar al carrito
+                    <svg class="icon icon-sm"><use xlink:href="#icon-cart"></use></svg>
+                    Añadir al carrito
                 </button>
             </div>
             {% else %}
-            <button class="btn btn-secondary" disabled style="opacity: 0.5; cursor: not-allowed;">
-                Producto agotado
-            </button>
+            <button class="btn btn-secondary" disabled style="opacity: 0.5;">Agotado</button>
             {% endif %}
 
             {% if producto.proveedor %}
-            <div style="padding-top: 1rem; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.85rem;">
+            <div style="padding-top: 1rem; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
+                <svg class="icon icon-sm"><use xlink:href="#icon-user"></use></svg>
                 Proveedor: {{ producto.proveedor.nombre }}
             </div>
             {% endif %}
@@ -75,34 +83,11 @@
 {% if relacionados %}
 <div class="container related-section">
     <div class="section-header">
-        <div>
-            <h2 class="section-title">Productos relacionados</h2>
-            <p class="section-subtitle">Más productos de {{ producto.categoria }}</p>
-        </div>
+        <h2 class="section-title">Relacionados</h2>
     </div>
     <div class="products-grid">
-        {% for rel in relacionados %}
-        <div class="product-card animate-in">
-            <a href="{% url 'catalogo:detalle' rel.id %}">
-                <div class="product-image" style="background: linear-gradient(135deg, {{ rel.categoria_color }}15, {{ rel.categoria_color }}05);">
-                    <span>{{ rel.categoria_icono }}</span>
-                </div>
-            </a>
-            <div class="product-info">
-                <span class="product-category">{{ rel.categoria_icono }} {{ rel.categoria }}</span>
-                <h3 class="product-name">
-                    <a href="{% url 'catalogo:detalle' rel.id %}">{{ rel.nombre }}</a>
-                </h3>
-                <div class="product-footer">
-                    <span class="product-price">{{ rel.precio_formateado }}</span>
-                    {% if rel.tiene_stock %}
-                    <button class="btn-add-cart js-add-cart" data-product-id="{{ rel.id }}">🛒 Agregar</button>
-                    {% else %}
-                    <button class="btn-add-cart" disabled>Agotado</button>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+        {% for producto in relacionados %}
+            {% include "catalogo/_product_card.html" with producto=producto %}
         {% endfor %}
     </div>
 </div>

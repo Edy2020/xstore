@@ -27,7 +27,6 @@ def index(request):
         categorias.append({
             'categoria': nombre,
             'total': cat['total'],
-            'icono': Productos.CATEGORIA_ICONOS.get(nombre, '📦'),
         })
 
     productos_destacados = productos_activos.filter(stock__gt=0).order_by('-id')[:8]
@@ -167,7 +166,6 @@ def ver_carrito(request):
             'cantidad': data['cantidad'],
             'subtotal': subtotal,
             'subtotal_formateado': _format_price(subtotal),
-            'icono': Productos.CATEGORIA_ICONOS.get(data.get('categoria', ''), '📦'),
         })
 
     return render(request, 'catalogo/carrito.html', {
@@ -257,7 +255,6 @@ def checkout(request):
             'cantidad': data['cantidad'],
             'subtotal': subtotal,
             'subtotal_formateado': _format_price(subtotal),
-            'icono': Productos.CATEGORIA_ICONOS.get(data.get('categoria', ''), '📦'),
         })
 
     return render(request, 'catalogo/checkout.html', {

@@ -1,17 +1,32 @@
 {% extends "catalogo/base.html" %}
 
-{% block title %}XStore · Catálogo de Anime y Manga{% endblock %}
+{% block title %}XStore · Catálogo de Productos Premium{% endblock %}
 
 {% block content %}
 <section class="hero">
     <div class="container">
         <div class="hero-content">
-            <span class="hero-badge">🎌 Tienda Anime & Manga</span>
-            <h1>Tu universo <span class="highlight">anime</span> en un solo lugar</h1>
-            <p>Explora nuestra colección de manga, figuras, ropa y accesorios. Todo lo que necesitas para llevar tu pasión al siguiente nivel.</p>
+            <span class="hero-badge">
+                <svg class="icon icon-sm">
+                    <use xlink:href="#icon-shield"></use>
+                </svg>
+                XStock
+            </span>
+            <h1>X <span class="highlight">STOCK</span></h1>
+            <p>Bienvenido a XStock, descubre todos nuestros productos nuevos.</p>
             <div class="hero-actions">
-                <a href="{% url 'catalogo:catalogo' %}" class="btn btn-primary">Explorar catálogo →</a>
-                <a href="{% url 'catalogo:ver_carrito' %}" class="btn btn-secondary">🛒 Ver carrito</a>
+                <a href="{% url 'catalogo:catalogo' %}" class="btn btn-primary">
+                    Explorar catálogo
+                    <svg class="icon icon-sm">
+                        <use xlink:href="#icon-arrow-right"></use>
+                    </svg>
+                </a>
+                <a href="{% url 'catalogo:ver_carrito' %}" class="btn btn-secondary">
+                    <svg class="icon icon-sm">
+                        <use xlink:href="#icon-cart"></use>
+                    </svg>
+                    Ver carrito
+                </a>
             </div>
         </div>
     </div>
@@ -22,16 +37,25 @@
         <div class="section-header">
             <div>
                 <h2 class="section-title">Categorías</h2>
-                <p class="section-subtitle">Encuentra lo que buscas por categoría</p>
+                <p class="section-subtitle">Explora nuestra variedad por sector</p>
             </div>
-            <a href="{% url 'catalogo:catalogo' %}" class="section-link">Ver todo →</a>
+            <a href="{% url 'catalogo:catalogo' %}" class="section-link">
+                Ver todo
+                <svg class="icon icon-sm">
+                    <use xlink:href="#icon-chevron-right"></use>
+                </svg>
+            </a>
         </div>
         <div class="categories-grid">
             {% for cat in categorias %}
             <a href="{% url 'catalogo:catalogo' %}?categoria={{ cat.categoria }}" class="category-card animate-in">
-                <span class="category-icon">{{ cat.icono }}</span>
+                <div class="category-icon">
+                    <svg class="icon icon-lg">
+                        <use xlink:href="#icon-grid"></use>
+                    </svg>
+                </div>
                 <div class="category-name">{{ cat.categoria }}</div>
-                <div class="category-count">{{ cat.total }} producto{{ cat.total|pluralize:"s" }}</div>
+                <div class="category-count">{{ cat.total }} item{{ cat.total|pluralize:"s" }}</div>
             </a>
             {% endfor %}
         </div>
@@ -42,43 +66,19 @@
     <div class="container">
         <div class="section-header">
             <div>
-                <h2 class="section-title">Productos destacados</h2>
-                <p class="section-subtitle">Lo más popular de nuestra tienda</p>
+                <h2 class="section-title">Últimas novedades</h2>
+                <p class="section-subtitle">Productos recién incorporados a nuestro stock</p>
             </div>
-            <a href="{% url 'catalogo:catalogo' %}" class="section-link">Ver todo →</a>
+            <a href="{% url 'catalogo:catalogo' %}" class="section-link">
+                Ver todo
+                <svg class="icon icon-sm">
+                    <use xlink:href="#icon-chevron-right"></use>
+                </svg>
+            </a>
         </div>
         <div class="products-grid">
             {% for producto in productos_destacados %}
-            <div class="product-card animate-in">
-                <a href="{% url 'catalogo:detalle' producto.id %}">
-                    <div class="product-image" style="background: linear-gradient(135deg, {{ producto.categoria_color }}15, {{ producto.categoria_color }}05);">
-                        {% if producto.stock_bajo %}
-                        <span class="product-badge badge-stock-low">¡Últimas unidades!</span>
-                        {% elif not producto.tiene_stock %}
-                        <span class="product-badge badge-out-of-stock">Agotado</span>
-                        {% endif %}
-                        <span>{{ producto.categoria_icono }}</span>
-                    </div>
-                </a>
-                <div class="product-info">
-                    <span class="product-category">{{ producto.categoria_icono }} {{ producto.categoria }}</span>
-                    <h3 class="product-name">
-                        <a href="{% url 'catalogo:detalle' producto.id %}">{{ producto.nombre }}</a>
-                    </h3>
-                    <div class="product-footer">
-                        <span class="product-price">{{ producto.precio_formateado }}</span>
-                        {% if producto.tiene_stock %}
-                        <button class="btn-add-cart js-add-cart"
-                                data-product-id="{{ producto.id }}"
-                                title="Agregar al carrito">
-                            🛒 Agregar
-                        </button>
-                        {% else %}
-                        <button class="btn-add-cart" disabled>Agotado</button>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
+            {% include "catalogo/_product_card.html" with producto=producto %}
             {% endfor %}
         </div>
     </div>

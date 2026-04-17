@@ -1,62 +1,65 @@
 {% extends "catalogo/base.html" %}
 
-{% block title %}Checkout · XStore{% endblock %}
+{% block title %}Finalizar Compra · XStore{% endblock %}
 
 {% block content %}
 <div class="container cart-container">
-    <div class="detail-breadcrumb" style="margin-bottom: 1.5rem;">
+    <div class="detail-breadcrumb" style="margin-bottom: 2rem;">
         <a href="{% url 'catalogo:index' %}">Inicio</a>
-        <span class="separator">›</span>
+        <span class="separator">/</span>
         <a href="{% url 'catalogo:ver_carrito' %}">Carrito</a>
-        <span class="separator">›</span>
-        <span>Confirmar compra</span>
+        <span class="separator">/</span>
+        <span>Checkout</span>
     </div>
 
-    <h1 class="cart-title">📋 Confirmar compra</h1>
-    <p class="cart-subtitle">Revisa tu pedido y completa la información para finalizar</p>
+    <h1 class="cart-title">Finalizar compra</h1>
+    <p class="cart-subtitle">Completa los detalles del pedido para procesar la transacción.</p>
 
     <form method="post" action="{% url 'catalogo:confirmar_compra' %}" id="checkout-form">
         {% csrf_token %}
         <div class="cart-layout">
             <div>
                 <div class="checkout-section">
-                    <h3 class="checkout-section-title">👤 Información del cliente</h3>
+                    <h3 class="checkout-section-title">
+                        <svg class="icon icon-sm"><use xlink:href="#icon-user"></use></svg>
+                        Datos del Cliente
+                    </h3>
                     <div class="checkout-fields">
                         <div class="field-group">
                             <label for="nombre_cliente">Nombre completo</label>
-                            <input type="text"
-                                   id="nombre_cliente"
-                                   name="nombre_cliente"
-                                   placeholder="Tu nombre"
-                                   required
-                                   class="checkout-input">
+                            <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Ej. Juan Pérez" required class="checkout-input">
                         </div>
                         <div class="field-group">
                             <label for="metodo_pago">Método de pago</label>
                             <select id="metodo_pago" name="metodo_pago" class="checkout-input" required>
-                                <option value="Efectivo">💵 Efectivo</option>
-                                <option value="Tarjeta de débito">💳 Tarjeta de débito</option>
-                                <option value="Tarjeta de crédito">💳 Tarjeta de crédito</option>
-                                <option value="Transferencia">🏦 Transferencia</option>
+                                <option value="Efectivo">Efectivo</option>
+                                <option value="Tarjeta de débito">Tarjeta de débito</option>
+                                <option value="Tarjeta de crédito">Tarjeta de crédito</option>
+                                <option value="Transferencia">Transferencia bancaria</option>
                             </select>
                         </div>
                         <div class="field-group">
-                            <label for="notas">Notas (opcional)</label>
-                            <textarea id="notas"
-                                      name="notas"
-                                      placeholder="Indicaciones especiales, dirección, etc."
-                                      rows="3"
-                                      class="checkout-input"></textarea>
+                            <label for="notas">Notas del pedido</label>
+                            <textarea id="notas" name="notas" placeholder="Instrucciones de entrega o notas adicionales..." rows="3" class="checkout-input"></textarea>
                         </div>
                     </div>
                 </div>
 
                 <div class="checkout-section">
-                    <h3 class="checkout-section-title">📦 Resumen del pedido ({{ items|length }} producto{{ items|length|pluralize:"s" }})</h3>
+                    <h3 class="checkout-section-title">
+                        <svg class="icon icon-sm"><use xlink:href="#icon-grid"></use></svg>
+                        Resumen de productos ({{ items|length }})
+                    </h3>
                     <div class="checkout-items">
                         {% for item in items %}
                         <div class="checkout-item">
-                            <div class="checkout-item-icon">{{ item.icono }}</div>
+                            <div class="checkout-item-icon">
+                                {% if item.imagen %}
+                                <img src="/media/{{ item.imagen }}" alt="{{ item.nombre }}">
+                                {% else %}
+                                <svg class="icon icon-sm"><use xlink:href="#icon-package"></use></svg>
+                                {% endif %}
+                            </div>
                             <div class="checkout-item-info">
                                 <div class="checkout-item-name">{{ item.nombre }}</div>
                                 <div class="checkout-item-meta">{{ item.precio_formateado }} × {{ item.cantidad }}</div>
@@ -69,26 +72,31 @@
             </div>
 
             <div class="cart-summary">
-                <h3>Total a pagar</h3>
+                <h3>Total del pedido</h3>
                 <div class="summary-row">
-                    <span class="label">Productos ({{ items|length }})</span>
+                    <span class="label">Subtotal</span>
                     <span>{{ total_formateado }}</span>
                 </div>
                 <div class="summary-row">
-                    <span class="label">Descuento</span>
+                    <span class="label">Gastos de gestión</span>
                     <span>$0</span>
                 </div>
                 <div class="summary-row total">
-                    <span class="label">Total</span>
+                    <span class="label">Total a pagar</span>
                     <span class="value">{{ total_formateado }}</span>
                 </div>
                 <div class="cart-summary-actions">
                     <button type="submit" class="btn btn-primary" id="btn-confirmar">
-                        ✅ Confirmar compra
+                        Confirmar y finalizar
                     </button>
                     <a href="{% url 'catalogo:ver_carrito' %}" class="btn btn-secondary">
-                        ← Volver al carrito
+                        <svg class="icon icon-sm"><use xlink:href="#icon-arrow-left"></use></svg>
+                        Revisar carrito
                     </a>
+                </div>
+                <div style="margin-top: 1.5rem; display: flex; align-items: center; gap: 0.5rem; color: var(--text-muted); font-size: 0.75rem;">
+                    <svg class="icon icon-sm"><use xlink:href="#icon-shield"></use></svg>
+                    Transacción segura protegida por XStore.
                 </div>
             </div>
         </div>
@@ -101,7 +109,7 @@
 document.getElementById('checkout-form').addEventListener('submit', function(e) {
     const btn = document.getElementById('btn-confirmar');
     btn.disabled = true;
-    btn.innerHTML = '⏳ Procesando...';
+    btn.innerHTML = 'Procesando...';
 });
 </script>
 {% endblock %}

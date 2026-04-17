@@ -81,4 +81,7 @@ SESSION_ENGINE = 'django.contrib.sessions.backends.db'
 SESSION_COOKIE_AGE = 86400
 SESSION_SAVE_EVERY_REQUEST = True
 
+MEDIA_URL = '/media/'
+XSTOCK_STORAGE_ROOT = BASE_DIR.parent / 'xstock' / 'storage' / 'app' / 'public'
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

@@ -12,7 +12,7 @@
     <form method="get" action="{% url 'catalogo:catalogo' %}" id="filter-form">
         <div class="filters-bar">
             <div class="search-box">
-                <span class="search-icon">🔍</span>
+                <svg class="search-icon icon icon-sm"><use xlink:href="#icon-search"></use></svg>
                 <input type="text"
                        name="q"
                        value="{{ query }}"
@@ -40,52 +40,10 @@
 
     <div class="products-grid">
         {% for producto in page_obj %}
-        <div class="product-card animate-in">
-            <a href="{% url 'catalogo:detalle' producto.id %}">
-                <div class="product-image" style="background: linear-gradient(135deg, {{ producto.categoria_color }}15, {{ producto.categoria_color }}05);">
-                    {% if producto.stock_bajo %}
-                    <span class="product-badge badge-stock-low">¡Últimas unidades!</span>
-                    {% elif not producto.tiene_stock %}
-                    <span class="product-badge badge-out-of-stock">Agotado</span>
-                    {% endif %}
-                    <span>{{ producto.categoria_icono }}</span>
-                </div>
-            </a>
-            <div class="product-info">
-                <span class="product-category">{{ producto.categoria_icono }} {{ producto.categoria }}</span>
-                <h3 class="product-name">
-                    <a href="{% url 'catalogo:detalle' producto.id %}">{{ producto.nombre }}</a>
-                </h3>
-                {% if producto.descripcion %}
-                <p style="color: var(--text-muted); font-size: 0.8rem; margin-bottom: 0.5rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
-                    {{ producto.descripcion }}
-                </p>
-                {% endif %}
-                <div class="product-footer">
-                    <div>
-                        <span class="product-price">{{ producto.precio_formateado }}</span>
-                        <div class="product-stock {% if producto.stock_bajo %}low{% endif %}">
-                            {% if producto.tiene_stock %}
-                                {{ producto.stock }} en stock
-                            {% else %}
-                                Sin stock
-                            {% endif %}
-                        </div>
-                    </div>
-                    {% if producto.tiene_stock %}
-                    <button class="btn-add-cart js-add-cart"
-                            data-product-id="{{ producto.id }}">
-                        🛒 Agregar
-                    </button>
-                    {% else %}
-                    <button class="btn-add-cart" disabled>Agotado</button>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
+            {% include "catalogo/_product_card.html" with producto=producto %}
         {% empty %}
         <div class="empty-state">
-            <div class="empty-state-icon">🔍</div>
+            <svg class="icon"><use xlink:href="#icon-alert"></use></svg>
             <h3>No se encontraron productos</h3>
             <p>Intenta con otra búsqueda o categoría</p>
         </div>
@@ -95,9 +53,15 @@
     {% if page_obj.has_other_pages %}
     <div class="pagination">
         {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}">← Anterior</a>
+        <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}">
+            <svg class="icon icon-sm"><use xlink:href="#icon-arrow-left"></use></svg> 
+            Ant.
+        </a>
         {% else %}
-        <span class="disabled">← Anterior</span>
+        <span class="disabled">
+            <svg class="icon icon-sm"><use xlink:href="#icon-arrow-left"></use></svg> 
+            Ant.
+        </span>
         {% endif %}
 
         {% for num in page_obj.paginator.page_range %}
@@ -109,9 +73,15 @@
         {% endfor %}
 
         {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}">Siguiente →</a>
+        <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}">
+            Sig.
+            <svg class="icon icon-sm"><use xlink:href="#icon-arrow-right"></use></svg>
+        </a>
         {% else %}
-        <span class="disabled">Siguiente →</span>
+        <span class="disabled">
+            Sig.
+            <svg class="icon icon-sm"><use xlink:href="#icon-arrow-right"></use></svg>
+        </span>
         {% endif %}
     </div>
     {% endif %}

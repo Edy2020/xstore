@@ -1,0 +1,45 @@
+{% load static %}
+<div class="product-card animate-in">
+    <a href="{% url 'catalogo:detalle' producto.id %}">
+        <div class="product-image">
+            {% if producto.stock_bajo %}
+            <span class="product-badge badge-stock-low">Stock bajo</span>
+            {% elif not producto.tiene_stock %}
+            <span class="product-badge badge-out-of-stock">Agotado</span>
+            {% endif %}
+            {% if producto.tiene_imagen %}
+            <img src="{{ producto.imagen_url }}" alt="{{ producto.nombre }}" class="product-img">
+            {% else %}
+            <div class="product-img-placeholder">
+                <svg class="icon"><use xlink:href="#icon-package"></use></svg>
+            </div>
+            {% endif %}
+        </div>
+    </a>
+    <div class="product-info">
+        <div class="product-category">{{ producto.categoria|default:"Producto" }}</div>
+        <h3 class="product-name">
+            <a href="{% url 'catalogo:detalle' producto.id %}">{{ producto.nombre }}</a>
+        </h3>
+        <div class="product-footer">
+            <div>
+                <span class="product-price">{{ producto.precio_formateado }}</span>
+                <div class="product-stock {% if producto.stock_bajo %}low{% endif %}">
+                    {% if producto.tiene_stock %}
+                        {{ producto.stock }} dispon.
+                    {% else %}
+                        Sin stock
+                    {% endif %}
+                </div>
+            </div>
+            {% if producto.tiene_stock %}
+            <button class="btn-add-cart js-add-cart" data-product-id="{{ producto.id }}">
+                <svg class="icon icon-sm"><use xlink:href="#icon-plus"></use></svg>
+                <span>Añadir</span>
+            </button>
+            {% else %}
+            <button class="btn-add-cart" disabled>Agotado</button>
+            {% endif %}
+        </div>
+    </div>
+</div>
