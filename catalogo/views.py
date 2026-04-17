@@ -162,6 +162,7 @@ def agregar_carrito(request):
             'precio': producto.precio,
             'cantidad': min(cantidad, producto.stock),
             'categoria': producto.categoria or '',
+            'imagen': producto.imagen,
         }
 
     _save_cart(request, carrito)
@@ -178,9 +179,16 @@ def ver_carrito(request):
     items = []
     total = 0
 
+    # Para asegurar que se muestren imágenes incluso si no estaban en sesión
+    pids = [int(pid) for pid in carrito.keys() if pid.isdigit()]
+    productos_db = {str(p.id): p.imagen for p in Productos.objects.filter(id__in=pids)}
+
     for pid, data in carrito.items():
         subtotal = data['precio'] * data['cantidad']
         total += subtotal
+        
+        imagen = productos_db.get(pid) or data.get('imagen')
+        
         items.append({
             'id': pid,
             'nombre': data['nombre'],
@@ -189,6 +197,7 @@ def ver_carrito(request):
             'cantidad': data['cantidad'],
             'subtotal': subtotal,
             'subtotal_formateado': _format_price(subtotal),
+            'imagen': imagen,
         })
 
     return render(request, 'catalogo/carrito.html', {
@@ -267,9 +276,17 @@ def checkout(request):
 
     items = []
     total = 0
+    
+    # Para asegurar que se muestren imágenes incluso si no estaban en sesión
+    pids = [int(pid) for pid in carrito.keys() if pid.isdigit()]
+    productos_db = {str(p.id): p.imagen for p in Productos.objects.filter(id__in=pids)}
+
     for pid, data in carrito.items():
         subtotal = data['precio'] * data['cantidad']
         total += subtotal
+        
+        imagen = productos_db.get(pid) or data.get('imagen')
+        
         items.append({
             'id': pid,
             'nombre': data['nombre'],
@@ -278,6 +295,7 @@ def checkout(request):
             'cantidad': data['cantidad'],
             'subtotal': subtotal,
             'subtotal_formateado': _format_price(subtotal),
+            'imagen': imagen,
         })
 
     return render(request, 'catalogo/checkout.html', {

@@ -16,14 +16,19 @@
 
     <nav class="navbar">
         <div class="navbar-inner">
-            <a href="{% url 'catalogo:index' %}" class="navbar-brand">
-                <span class="brand-x">X</span><span>Store</span>
-            </a>
+            <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Menu">
+                <svg class="icon"><use xlink:href="#icon-menu"></use></svg>
+            </button>
 
-            <ul class="navbar-nav">
-                <li><a href="{% url 'catalogo:index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
-                <li><a href="{% url 'catalogo:catalogo' %}" class="{% if request.resolver_match.url_name == 'catalogo' %}active{% endif %}">Catálogo</a></li>
-            </ul>
+            <div class="navbar-group-left">
+                <a href="{% url 'catalogo:index' %}" class="navbar-brand">
+                    <span class="brand-x">X</span><span>Store</span>
+                </a>
+                <ul class="navbar-nav">
+                    <li><a href="{% url 'catalogo:index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
+                    <li><a href="{% url 'catalogo:catalogo' %}" class="{% if request.resolver_match.url_name == 'catalogo' %}active{% endif %}">Catálogo</a></li>
+                </ul>
+            </div>
 
             <div class="nav-search" id="nav-search-container">
                 <div class="search-input-wrapper">
@@ -33,18 +38,66 @@
                 <div class="search-results-dropdown" id="live-search-results"></div>
             </div>
 
-            <div class="navbar-actions">
-                <a href="{% url 'catalogo:ver_carrito' %}" class="btn-cart" id="btn-cart-nav">
-                    <svg class="icon"><use xlink:href="#icon-cart"></use></svg>
-                    <span>Carrito</span>
-                    <span class="cart-badge" id="cart-badge">0</span>
-                </a>
-                <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Menu">
-                    <svg class="icon"><use xlink:href="#icon-menu"></use></svg>
-                </button>
+            <div class="navbar-group-right">
+                <div class="navbar-actions">
+                    <a href="{% url 'catalogo:ver_carrito' %}" class="btn-cart" id="btn-cart-nav">
+                        <svg class="icon"><use xlink:href="#icon-cart"></use></svg>
+                        <span class="cart-badge" id="cart-badge">0</span>
+                    </a>
+                </div>
             </div>
         </div>
     </nav>
+
+    <!-- Sidebar Móvil -->
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+    <aside class="mobile-sidebar" id="mobile-sidebar">
+        <div class="sidebar-header">
+            <div class="navbar-brand">
+                <span class="brand-x">X</span><span>Store</span>
+            </div>
+            <button class="btn-close-sidebar" id="close-sidebar">
+                <svg class="icon icon-sm"><use xlink:href="#icon-plus"></use></svg>
+            </button>
+        </div>
+        
+        <div class="sidebar-content">
+            <div class="sidebar-section">
+                <h3 class="sidebar-label">Navegación</h3>
+                <ul class="sidebar-nav">
+                    <li>
+                        <a href="{% url 'catalogo:index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                            <svg class="icon icon-sm"><use xlink:href="#icon-home"></use></svg>
+                            Inicio
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'catalogo:catalogo' %}" class="{% if request.resolver_match.url_name == 'catalogo' %}active{% endif %}">
+                            <svg class="icon icon-sm"><use xlink:href="#icon-package"></use></svg>
+                            Catálogo
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            {% if global_categorias %}
+            <div class="sidebar-section">
+                <h3 class="sidebar-label">Categorías</h3>
+                <ul class="sidebar-nav">
+                    {% for cat in global_categorias %}
+                    <li>
+                        <a href="{% url 'catalogo:catalogo' %}?categoria={{ cat.nombre }}">
+                            <svg class="icon icon-sm"><use xlink:href="#icon-grid"></use></svg>
+                            {{ cat.nombre }}
+                            <span class="qty">{{ cat.total }}</span>
+                        </a>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </aside>
 
     <main class="main-content">
         {% block content %}{% endblock %}
@@ -66,6 +119,24 @@
 
     <script src="{% static 'catalogo/js/cart.js' %}"></script>
     <script src="{% static 'catalogo/js/search.js' %}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const toggleBtn = document.getElementById('mobile-menu-toggle');
+            const closeBtn = document.getElementById('close-sidebar');
+            const sidebar = document.getElementById('mobile-sidebar');
+            const overlay = document.getElementById('sidebar-overlay');
+
+            function toggleSidebar() {
+                sidebar.classList.toggle('active');
+                overlay.classList.toggle('active');
+                document.body.style.overflow = sidebar.classList.contains('active') ? 'hidden' : '';
+            }
+
+            toggleBtn?.addEventListener('click', toggleSidebar);
+            closeBtn?.addEventListener('click', toggleSidebar);
+            overlay?.addEventListener('click', toggleSidebar);
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>
