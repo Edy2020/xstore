@@ -1,8 +1,10 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.http import JsonResponse
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
-from .models import Productos
+from django.db import transaction
+from django.utils import timezone
+from .models import Productos, Ventas, DetalleVentas, LogActividades
 
 
 def _format_price(value):
@@ -87,6 +89,8 @@ def detalle(request, producto_id):
         'relacionados': relacionados,
     })
 
+
+# ==================== CART (Session) ====================
 
 def _get_cart(request):
     return request.session.get('carrito', {})
@@ -230,3 +234,134 @@ def vaciar_carrito(request):
 
 def carrito_count(request):
     return JsonResponse({'count': _cart_count(request)})
+
+
+# ==================== CHECKOUT ====================
+
+def checkout(request):
+    carrito = _get_cart(request)
+
+    if not carrito:
+        return redirect('catalogo:ver_carrito')
+
+    items = []
+    total = 0
+    for pid, data in carrito.items():
+        subtotal = data['precio'] * data['cantidad']
+        total += subtotal
+        items.append({
+            'id': pid,
+            'nombre': data['nombre'],
+            'precio': data['precio'],
+            'precio_formateado': _format_price(data['precio']),
+            'cantidad': data['cantidad'],
+            'subtotal': subtotal,
+            'subtotal_formateado': _format_price(subtotal),
+            'icono': Productos.CATEGORIA_ICONOS.get(data.get('categoria', ''), '📦'),
+        })
+
+    return render(request, 'catalogo/checkout.html', {
+        'items': items,
+        'total': total,
+        'total_formateado': _format_price(total),
+    })
+
+
+def confirmar_compra(request):
+    if request.method != 'POST':
+        return JsonResponse({'ok': False, 'error': 'Método no permitido'}, status=405)
+
+    carrito = _get_cart(request)
+
+    if not carrito:
+        return render(request, 'catalogo/compra_resultado.html', {
+            'exito': False,
+            'error': 'El carrito está vacío.',
+        })
+
+    metodo_pago = request.POST.get('metodo_pago', 'Efectivo')
+    nombre_cliente = request.POST.get('nombre_cliente', 'Cliente XStore')
+    notas = request.POST.get('notas', '')
+
+    try:
+        with transaction.atomic():
+            subtotal_venta = 0
+            total_venta = 0
+
+            venta = Ventas(
+                user_id=None,
+                subtotal=0,
+                descuento_total=0,
+                total=0,
+                estado='completada',
+                metodo_pago=metodo_pago,
+                notas=f"[XStore Online] Cliente: {nombre_cliente}. {notas}".strip(),
+            )
+            venta.save()
+
+            for pid, data in carrito.items():
+                producto = Productos.objects.select_for_update().get(id=int(pid))
+
+                if producto.stock < data['cantidad']:
+                    raise Exception(
+                        f"Stock insuficiente para '{producto.nombre}'. "
+                        f"Disponible: {producto.stock}, solicitado: {data['cantidad']}"
+                    )
+
+                cantidad = data['cantidad']
+                precio_unitario = producto.precio
+                subtotal_item = precio_unitario * cantidad
+
+                DetalleVentas(
+                    venta=venta,
+                    producto=producto,
+                    producto_nombre=producto.nombre,
+                    cantidad=cantidad,
+                    precio_unitario=precio_unitario,
+                    descuento_porcentaje=0,
+                    subtotal=subtotal_item,
+                ).save()
+
+                producto.stock -= cantidad
+                producto.save()
+
+                subtotal_venta += subtotal_item
+                total_venta += subtotal_item
+
+            venta.subtotal = subtotal_venta
+            venta.descuento_total = 0
+            venta.total = total_venta
+            venta.save()
+
+            client_ip = request.META.get('HTTP_X_FORWARDED_FOR', request.META.get('REMOTE_ADDR', ''))
+            if ',' in client_ip:
+                client_ip = client_ip.split(',')[0].strip()
+
+            LogActividades(
+                user_id=None,
+                accion='Creación',
+                modulo='Ventas',
+                detalle=(
+                    f"[XStore Online] Venta #{str(venta.id).zfill(5)} por "
+                    f"{_format_price(total_venta)} — Cliente: {nombre_cliente} — "
+                    f"Método: {metodo_pago}"
+                ),
+                ip_address=client_ip,
+            ).save()
+
+        request.session['carrito'] = {}
+        request.session.modified = True
+
+        return render(request, 'catalogo/compra_resultado.html', {
+            'exito': True,
+            'venta_id': venta.id,
+            'venta_total': _format_price(total_venta),
+            'metodo_pago': metodo_pago,
+            'nombre_cliente': nombre_cliente,
+        })
+
+    except Exception as e:
+        return render(request, 'catalogo/compra_resultado.html', {
+            'exito': False,
+            'error': str(e),
+        })

@@ -82,3 +82,95 @@ class Productos(models.Model):
     @property
     def categoria_color(self):
         return self.CATEGORIA_COLORES.get(self.categoria, '#6366f1')
+
+
+class Ventas(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(
+        'Users', models.DO_NOTHING, blank=True, null=True
+    )
+    subtotal = models.BigIntegerField(default=0)
+    descuento_total = models.BigIntegerField(default=0)
+    total = models.BigIntegerField(default=0)
+    estado = models.CharField(max_length=10, default='completada')
+    metodo_pago = models.CharField(max_length=255, default='efectivo')
+    notas = models.TextField(blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'ventas'
+
+    def __str__(self):
+        return f"Venta #{self.id}"
+
+
+class DetalleVentas(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    venta = models.ForeignKey(Ventas, models.CASCADE)
+    producto = models.ForeignKey(
+        Productos, models.DO_NOTHING, blank=True, null=True
+    )
+    producto_nombre = models.CharField(max_length=255)
+    cantidad = models.IntegerField()
+    precio_unitario = models.BigIntegerField()
+    descuento_porcentaje = models.IntegerField(default=0)
+    subtotal = models.BigIntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'detalle_ventas'
+
+
+class LogActividades(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    user = models.ForeignKey(
+        'Users', models.DO_NOTHING, blank=True, null=True
+    )
+    accion = models.CharField(max_length=255)
+    modulo = models.CharField(max_length=255)
+    detalle = models.TextField()
+    ip_address = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        managed = False
+        db_table = 'log_actividades'
+
+
+class Users(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    name = models.CharField(max_length=255)
+    email = models.CharField(unique=True, max_length=255)
+    email_verified_at = models.DateTimeField(blank=True, null=True)
+    password = models.CharField(max_length=255)
+    remember_token = models.CharField(max_length=100, blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+    role = models.ForeignKey('Roles', models.DO_NOTHING, blank=True, null=True)
+    estado = models.CharField(max_length=8)
+    last_login_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'users'
+
+    def __str__(self):
+        return self.name
+
+
+class Roles(models.Model):
+    id = models.BigAutoField(primary_key=True)
+    nombre = models.CharField(unique=True, max_length=255)
+    descripcion = models.CharField(max_length=255, blank=True, null=True)
+    permisos = models.JSONField(blank=True, null=True)
+    created_at = models.DateTimeField(blank=True, null=True)
+    updated_at = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'roles'

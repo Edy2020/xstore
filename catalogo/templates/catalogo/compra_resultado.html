@@ -1,0 +1,54 @@
+{% extends "catalogo/base.html" %}
+
+{% block title %}{% if exito %}¡Compra exitosa!{% else %}Error{% endif %} · XStore{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 4rem 2rem;">
+    {% if exito %}
+    <div class="result-card success">
+        <div class="result-icon">🎉</div>
+        <h1 class="result-title">¡Compra realizada con éxito!</h1>
+        <p class="result-subtitle">Tu pedido ha sido procesado correctamente</p>
+
+        <div class="result-details">
+            <div class="result-row">
+                <span class="result-label">Nº de venta</span>
+                <span class="result-value">#{{ venta_id|stringformat:"05d" }}</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Cliente</span>
+                <span class="result-value">{{ nombre_cliente }}</span>
+            </div>
+            <div class="result-row">
+                <span class="result-label">Método de pago</span>
+                <span class="result-value">{{ metodo_pago }}</span>
+            </div>
+            <div class="result-row total">
+                <span class="result-label">Total pagado</span>
+                <span class="result-value highlight">{{ venta_total }}</span>
+            </div>
+        </div>
+
+        <p class="result-note">El stock ha sido actualizado automáticamente. Esta venta aparecerá en el historial de XStock.</p>
+
+        <div class="result-actions">
+            <a href="{% url 'catalogo:catalogo' %}" class="btn btn-primary">Seguir comprando →</a>
+            <a href="{% url 'catalogo:index' %}" class="btn btn-secondary">Volver al inicio</a>
+        </div>
+    </div>
+
+    {% else %}
+
+    <div class="result-card error">
+        <div class="result-icon">❌</div>
+        <h1 class="result-title">Error al procesar la compra</h1>
+        <p class="result-subtitle">{{ error }}</p>
+
+        <div class="result-actions">
+            <a href="{% url 'catalogo:ver_carrito' %}" class="btn btn-primary">← Volver al carrito</a>
+            <a href="{% url 'catalogo:catalogo' %}" class="btn btn-secondary">Ver catálogo</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

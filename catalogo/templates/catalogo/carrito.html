@@ -51,6 +51,7 @@
                 <span class="value" id="cart-total">{{ total_formateado }}</span>
             </div>
             <div class="cart-summary-actions">
+                <a href="{% url 'catalogo:checkout' %}" class="btn btn-primary">💳 Proceder al pago</a>
                 <a href="{% url 'catalogo:catalogo' %}" class="btn btn-secondary">← Seguir comprando</a>
                 <button class="btn btn-danger btn-sm js-clear-cart">🗑️ Vaciar carrito</button>
             </div>
