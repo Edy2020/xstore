@@ -23,7 +23,13 @@
                     <div class="cart-item-name">
                         <a href="{% url 'catalogo:detalle' item.id %}">{{ item.nombre }}</a>
                     </div>
-                    <div class="cart-item-price">{{ item.precio_formateado }}</div>
+                    <div class="cart-item-price">
+                        {{ item.precio_formateado }}
+                        {% if item.tiene_ahorro %}
+                        <span class="price-old" style="font-size: 0.7rem; margin-left: 5px;">{{ item.precio_original_formateado }}</span>
+                        <div style="font-size: 0.65rem; color: var(--success); font-weight: 700;">Ahorras {{ item.ahorro_formateado }}</div>
+                        {% endif %}
+                    </div>
                 </div>
                 <div class="cart-item-qty">
                     <div class="qty-selector">

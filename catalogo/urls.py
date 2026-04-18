@@ -16,4 +16,14 @@ urlpatterns = [
     path('checkout/', views.checkout, name='checkout'),
     path('checkout/confirmar/', views.confirmar_compra, name='confirmar_compra'),
     path('buscar/live/', views.buscar_live, name='buscar_live'),
+    path('sobre-nosotros/', views.sobre_nosotros, name='sobre_nosotros'),
+    path('contacto/', views.contactanos, name='contactanos'),
+    
+    # Autenticación y Perfil
+    path('login/', views.login_usuario, name='login'),
+    path('registro/', views.registro_usuario, name='registro'),
+    path('logout/', views.logout_usuario, name='logout'),
+    path('perfil/', views.perfil_usuario, name='perfil'),
+    path('perfil/eliminar/', views.eliminar_cuenta, name='eliminar_cuenta'),
+    path('compra/<int:venta_id>/detalle/', views.detalle_compra_api, name='detalle_compra_api'),
 ]

@@ -22,19 +22,28 @@
             </div>
 
             <div class="filter-pills">
-                <a href="{% url 'catalogo:catalogo' %}{% if query %}?q={{ query }}{% endif %}"
+                <a href="{% url 'catalogo:catalogo' %}{% if query %}?q={{ query }}{% if orden_actual %}&orden={{ orden_actual }}{% endif %}{% elif orden_actual %}?orden={{ orden_actual }}{% endif %}"
                    class="filter-pill {% if not categoria_actual %}active{% endif %}">
                     Todos
                 </a>
                 {% for cat in categorias %}
-                <a href="{% url 'catalogo:catalogo' %}?categoria={{ cat }}{% if query %}&q={{ query }}{% endif %}"
+                <a href="{% url 'catalogo:catalogo' %}?categoria={{ cat }}{% if query %}&q={{ query }}{% endif %}{% if orden_actual %}&orden={{ orden_actual }}{% endif %}"
                    class="filter-pill {% if categoria_actual == cat %}active{% endif %}">
                     {{ cat }}
                 </a>
                 {% endfor %}
             </div>
 
-            <span class="results-count">{{ page_obj.paginator.count }} resultado{{ page_obj.paginator.count|pluralize:"s" }}</span>
+            <div class="filters-bar-bottom">
+                <div class="sort-box">
+                    <select name="orden" id="sort-select" onchange="this.form.submit()">
+                        <option value="" {% if not orden_actual %}selected{% endif %}>Recomendados</option>
+                        <option value="precio_asc" {% if orden_actual == 'precio_asc' %}selected{% endif %}>Precio: Menor a Mayor</option>
+                        <option value="precio_desc" {% if orden_actual == 'precio_desc' %}selected{% endif %}>Precio: Mayor a Menor</option>
+                    </select>
+                </div>
+                <span class="results-count">{{ page_obj.paginator.count }} resultados</span>
+            </div>
         </div>
     </form>
 
@@ -53,7 +62,7 @@
     {% if page_obj.has_other_pages %}
     <div class="pagination">
         {% if page_obj.has_previous %}
-        <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}">
+        <a href="?page={{ page_obj.previous_page_number }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}{% if orden_actual %}&orden={{ orden_actual }}{% endif %}">
             <svg class="icon icon-sm"><use xlink:href="#icon-arrow-left"></use></svg> 
             Ant.
         </a>
@@ -68,12 +77,12 @@
             {% if page_obj.number == num %}
             <span class="current">{{ num }}</span>
             {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
-            <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}">{{ num }}</a>
+            <a href="?page={{ num }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}{% if orden_actual %}&orden={{ orden_actual }}{% endif %}">{{ num }}</a>
             {% endif %}
         {% endfor %}
 
         {% if page_obj.has_next %}
-        <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}">
+        <a href="?page={{ page_obj.next_page_number }}{% if query %}&q={{ query }}{% endif %}{% if categoria_actual %}&categoria={{ categoria_actual }}{% endif %}{% if orden_actual %}&orden={{ orden_actual }}{% endif %}">
             Sig.
             <svg class="icon icon-sm"><use xlink:href="#icon-arrow-right"></use></svg>
         </a>

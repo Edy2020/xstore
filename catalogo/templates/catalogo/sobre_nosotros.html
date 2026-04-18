@@ -1,0 +1,61 @@
+{% extends "catalogo/base.html" %}
+
+{% block title %}Sobre Nosotros · XStore{% endblock %}
+
+{% block content %}
+<div class="container container-narrow" style="padding: 4rem 1.25rem;">
+    <div class="text-center mb-4">
+        <span class="brand-badge mb-2">Nuestra Historia</span>
+        <h1 class="display-title"><span class="highlight">X</span>STORE</h1>
+        <p class="text-muted lead">Pasión por la tecnología y el diseño desde 2026.</p>
+    </div>
+
+    <div class="about-grid mt-4">
+        <div class="about-card">
+            <h3 class="mb-2">¿Quiénes somos?</h3>
+            <p>XStore nació con la visión de centralizar los mejores productos premium en un solo ecosistema digital. No somos solo una tienda, somos una comunidad de entusiastas que valoran la calidad y la exclusividad.</p>
+        </div>
+
+        <div class="about-card">
+            <h3 class="mb-2">Nuestra Misión</h3>
+            <p>Brindar una experiencia de compra fluida, segura y visualmente impactante, conectando a nuestros clientes con productos que inspiran excelencia.</p>
+        </div>
+
+        <div class="about-card">
+            <h3 class="mb-2">Nuestros Valores</h3>
+            <ul class="values-list">
+                <li><strong>Calidad:</strong> Solo lo mejor llega a nuestro catálogo.</li>
+                <li><strong>Innovación:</strong> Evolucionamos nuestra plataforma constantemente.</li>
+                <li><strong>Confianza:</strong> Tu seguridad es nuestra prioridad número uno.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+<style>
+    .container-narrow { max-width: 800px; margin: 0 auto; }
+    .text-center { text-align: center; }
+    .mb-2 { margin-bottom: 0.5rem; }
+    .mb-4 { margin-bottom: 2rem; }
+    .mt-4 { margin-top: 2rem; }
+    .display-title { font-size: 3rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 0.5rem; }
+    .lead { font-size: 1.1rem; line-height: 1.6; }
+    
+    .about-grid { display: grid; gap: 2rem; }
+    .about-card { background: var(--bg-card); border: 1px solid var(--border-color); padding: 2.5rem; border-radius: var(--radius-md); transition: transform 0.3s ease; }
+    .about-card:hover { transform: translateY(-5px); border-color: var(--accent); }
+    .about-card h3 { color: var(--accent); font-weight: 700; }
+    .about-card p { color: var(--text-secondary); line-height: 1.7; }
+    
+    .values-list { list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.75rem; }
+    .values-list li { color: var(--text-secondary); position: relative; padding-left: 1.5rem; }
+    .values-list li::before { content: '✓'; position: absolute; left: 0; color: var(--accent); font-weight: bold; }
+    
+    .brand-badge { display: inline-block; padding: 0.25rem 0.75rem; background: rgba(124, 92, 255, 0.1); color: var(--accent); border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+    @media (max-width: 768px) {
+        .display-title { font-size: 2.2rem; }
+        .about-card { padding: 1.5rem; }
+    }
+</style>
+{% endblock %}

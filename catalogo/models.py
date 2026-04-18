@@ -29,6 +29,7 @@ class Productos(models.Model):
     imagen = models.CharField(max_length=255, blank=True, null=True)
     categoria = models.CharField(max_length=255, blank=True, null=True)
     precio = models.BigIntegerField()
+    precio_oferta = models.BigIntegerField(db_column='descuento', blank=True, null=True)
     stock = models.IntegerField()
     estado = models.CharField(max_length=8)
     created_at = models.DateTimeField(blank=True, null=True)
@@ -45,7 +46,30 @@ class Productos(models.Model):
         return self.nombre
 
     @property
+    def en_oferta(self):
+        return self.precio_oferta is not None and self.precio_oferta > 0 and self.precio_oferta < 100
+
+    @property
+    def precio_actual(self):
+        if self.en_oferta:
+            # Calculamos el precio con el porcentaje de descuento
+            descuento_decimal = self.precio_oferta / 100
+            nuevo_precio = self.precio * (1 - descuento_decimal)
+            return round(nuevo_precio)
+        return self.precio
+
+    @property
+    def ahorro_porcentaje(self):
+        if self.en_oferta:
+            return self.precio_oferta
+        return 0
+
+    @property
     def precio_formateado(self):
+        return f"${self.precio_actual:,.0f}".replace(",", ".")
+
+    @property
+    def precio_original_formateado(self):
         return f"${self.precio:,.0f}".replace(",", ".")
 
     @property
@@ -136,7 +160,7 @@ class Users(models.Model):
     updated_at = models.DateTimeField(blank=True, null=True)
     role = models.ForeignKey('Roles', models.DO_NOTHING, blank=True, null=True)
     estado = models.CharField(max_length=8)
-    last_login_at = models.DateTimeField(blank=True, null=True)
+    last_login = models.DateTimeField(db_column='last_login_at', blank=True, null=True)
 
     class Meta:
         managed = False
@@ -144,6 +168,18 @@ class Users(models.Model):
 
     def __str__(self):
         return self.name
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
+
+    @property
+    def is_active(self):
+        return self.estado == 'activo'
 
 
 class Roles(models.Model):
@@ -157,3 +193,19 @@ class Roles(models.Model):
     class Meta:
         managed = False
         db_table = 'roles'
+
+class Perfiles(models.Model):
+    user = models.OneToOneField('Users', on_delete=models.CASCADE, related_name='perfil', db_column='user_id', db_constraint=False)
+    direccion = models.CharField(max_length=255, blank=True, null=True)
+    telefono = models.CharField(max_length=20, blank=True, null=True)
+    ciudad = models.CharField(max_length=100, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'usuarios_perfiles'
+        verbose_name = 'Perfil de Usuario'
+        verbose_name_plural = 'Perfiles de Usuarios'
+
+    def __str__(self):
+        return f"Perfil de {self.user.name}"

@@ -1,0 +1,399 @@
+{% extends "catalogo/base.html" %}
+
+{% block title %}Mi Perfil · XStore{% endblock %}
+
+{% block content %}
+<section class="section profile-section">
+    <div class="container-profile">
+        
+        <!-- Header del Perfil -->
+        <div class="profile-header animate-in">
+            <div class="profile-header-content">
+                <div class="profile-avatar-large">
+                    {{ request.user.name|slice:":1"|upper }}
+                </div>
+                <div class="profile-title-group">
+                    <h1>Hola, {{ request.user.name }}</h1>
+                    <p>Gestiona tu cuenta y revisa tu historial de compras.</p>
+                </div>
+            </div>
+            <div class="profile-header-actions">
+                <a href="{% url 'catalogo:logout' %}" class="btn btn-logout" title="Seguro que quieres salir?">
+                    <svg class="icon icon-xs"><use xlink:href="#icon-log-out"></use></svg>
+                    <span>Cerrar Sesión</span>
+                </a>
+            </div>
+        </div>
+
+        {% if messages %}
+        <div class="messages animate-in" style="animation-delay: 0.1s;">
+            {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Navegación por Pestañas -->
+        <div class="profile-tabs animate-in" style="animation-delay: 0.1s;">
+            <button class="tab-btn active" data-tab="datos">
+                <svg class="icon icon-xs"><use xlink:href="#icon-user"></use></svg>
+                Mis Datos
+            </button>
+            <button class="tab-btn" data-tab="pedidos">
+                <svg class="icon icon-xs"><use xlink:href="#icon-package"></use></svg>
+                Mis Pedidos
+            </button>
+        </div>
+
+        <div class="profile-grid">
+            <!-- Pestaña: Mis Datos -->
+            <div id="tab-datos" class="tab-content active animate-in" style="animation-delay: 0.2s;">
+                <div class="profile-main-card">
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="form-card">
+                            <div class="form-card-header">
+                                <svg class="icon icon-xs text-accent"><use xlink:href="#icon-user"></use></svg>
+                                <h3>Información Personal</h3>
+                            </div>
+                            <div class="form-card-body">
+                                <div class="form-row">
+                                    <div class="field-group">
+                                        <label>Nombre completo</label>
+                                        <input type="text" name="nombre" value="{{ request.user.name }}" required class="profile-input">
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Correo electrónico</label>
+                                        <input type="email" value="{{ request.user.email }}" disabled class="profile-input input-disabled">
+                                        <small class="text-muted">El correo no puede ser modificado.</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-card">
+                            <div class="form-card-header">
+                                <svg class="icon icon-xs text-accent"><use xlink:href="#icon-truck"></use></svg>
+                                <h3>Dirección de Envío</h3>
+                            </div>
+                            <div class="form-card-body">
+                                <div class="field-group mb-4">
+                                    <label>Dirección completa</label>
+                                    <input type="text" name="direccion" value="{{ perfil.direccion|default:'' }}" placeholder="Calle, número, depto..." class="profile-input">
+                                </div>
+                                <div class="form-row">
+                                    <div class="field-group">
+                                        <label>Ciudad</label>
+                                        <input type="text" name="ciudad" value="{{ perfil.ciudad|default:'' }}" placeholder="Tu ciudad" class="profile-input">
+                                    </div>
+                                    <div class="field-group">
+                                        <label>Teléfono de contacto</label>
+                                        <input type="text" name="telefono" value="{{ perfil.telefono|default:'' }}" placeholder="+56 9 ..." class="profile-input">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions-bar mb-5">
+                            <button type="submit" class="btn btn-save">
+                                <svg class="icon icon-xs"><use xlink:href="#icon-check"></use></svg>
+                                Guardar cambios
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="profile-danger-zone mt-5">
+                    <div class="danger-card">
+                        <div class="danger-card-header">
+                            <svg class="icon icon-xs"><use xlink:href="#icon-alert"></use></svg>
+                            <h3>Zona de Peligro</h3>
+                        </div>
+                        <div class="danger-card-body">
+                            <p class="text-muted small mb-3">Una vez desactivada, no podrás iniciar sesión ni ver tus pedidos.</p>
+                            <form action="{% url 'catalogo:eliminar_cuenta' %}" method="POST" onsubmit="return confirm('¿Confirmas la desactivación?')">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-danger-outline">Desactivar mi cuenta</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña: Mis Pedidos -->
+            <div id="tab-pedidos" class="tab-content animate-in" style="animation-delay: 0.2s;">
+                <div class="orders-card">
+                    <div class="form-card-header">
+                        <svg class="icon icon-xs text-accent"><use xlink:href="#icon-grid"></use></svg>
+                        <h3>Historial de Compras</h3>
+                    </div>
+                    <div class="form-card-body">
+                        {% if ventas %}
+                        <div class="orders-table-wrapper">
+                            <table class="orders-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Fecha</th>
+                                        <th class="hide-mobile">Pago</th>
+                                        <th>Estado</th>
+                                        <th class="text-right">Total</th>
+                                        <th class="text-center">Ver</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for venta in ventas %}
+                                    <tr class="order-row interactive-row" data-id="{{ venta.id }}" title="Click para ver detalle">
+                                        <td><span class="order-id">#{{ venta.id|stringformat:"05d" }}</span></td>
+                                        <td>{{ venta.created_at|date:"d/m/y" }}</td>
+                                        <td class="hide-mobile small">{{ venta.metodo_pago }}</td>
+                                        <td><span class="status-badge status-{{ venta.estado }}">{{ venta.estado|capfirst }}</span></td>
+                                        <td class="text-right font-bold">{{ venta.total_formateado }}</td>
+                                        <td class="text-center hide-mobile">
+                                            <div class="row-indicator">
+                                                <svg class="icon icon-xs"><use xlink:href="#icon-search"></use></svg>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <div class="empty-orders">
+                            <p class="text-muted">No tienes pedidos aún.</p>
+                            <a href="{% url 'catalogo:catalogo' %}" class="btn btn-save btn-sm mt-3">Ir a la tienda</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Modal de Detalle de Compra (Compact Redesign) -->
+<div class="modal-overlay" id="order-detail-modal">
+    <div class="modal-content animate-in">
+        <div class="modal-header">
+            <div class="modal-header-main">
+                <svg class="icon icon-xs text-accent"><use xlink:href="#icon-package"></use></svg>
+                <h3>Pedido <span id="modal-order-id"></span></h3>
+            </div>
+            <button class="modal-close" id="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div id="modal-loading" class="modal-loader">
+                <div class="spinner"></div>
+                <p class="small">Cargando...</p>
+            </div>
+            <div id="modal-data" style="display: none;">
+                <div class="detail-summary-grid mb-4">
+                    <div class="summary-item-mini">
+                        <label>Fecha</label>
+                        <span id="modal-order-date"></span>
+                    </div>
+                    <div class="summary-item-mini">
+                        <label>Pago</label>
+                        <span id="modal-order-method"></span>
+                    </div>
+                </div>
+                
+                <div class="info-details-box-compact mb-4">
+                    <div class="info-row-mini"><label>Cliente:</label><span id="modal-client-name"></span></div>
+                    <div class="info-row-mini"><label>Dirección:</label><span id="modal-client-address"></span></div>
+                    <div class="info-row-mini"><label>Teléfono:</label><span id="modal-client-phone"></span></div>
+                    <div id="modal-client-notes-container" class="mt-2" style="display: none;">
+                        <label class="info-label-mini">Notas:</label>
+                        <p id="modal-client-notes" class="small italic text-muted"></p>
+                    </div>
+                </div>
+
+                <div class="modal-table-container">
+                    <table class="detail-table-compact">
+                        <thead><tr><th>Producto</th><th class="text-center">Cant.</th><th class="text-right">Total</th></tr></thead>
+                        <tbody id="modal-items-body"></tbody>
+                    </table>
+                </div>
+                <div class="modal-total-bar-compact mt-3">
+                    <span class="total-label">Total Pagado:</span>
+                    <span id="modal-order-total" class="total-value text-accent"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+/* CSS Compact Premium */
+.profile-section { padding: 3rem 0; min-height: 70vh; }
+.container-profile { max-width: 800px; margin: 0 auto; padding: 0 1.5rem; }
+
+.profile-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.profile-header-content { display: flex; align-items: center; gap: 1.25rem; }
+.profile-avatar-large { width: 56px; height: 56px; flex: 0 0 56px; background: var(--accent); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: 800; box-shadow: 0 6px 12px rgba(124, 92, 255, 0.2); }
+.profile-title-group h1 { font-size: 1.4rem; font-weight: 800; color: white; margin: 0; }
+.profile-title-group p { font-size: 0.9rem; color: #8a8a8e; margin-top: 2px; }
+
+.btn-logout { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.1rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: #ccc; font-weight: 700; font-size: 0.8rem; text-decoration: none; transition: 0.2s; }
+.btn-logout:hover { color: #ff4e4e; border-color: #ff4e4e; background: rgba(255,78,78,0.05); }
+
+.profile-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.tab-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: transparent; border: none; border-bottom: 3px solid transparent; color: #777; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; position: relative; bottom: -2px; }
+.tab-btn:hover { color: white; }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+
+.form-card, .orders-card, .danger-card { background: #121214; border: 1px solid rgba(255,255,255,0.05); border-radius: 14px; margin-bottom: 1.5rem; overflow: hidden; }
+.form-card-header, .danger-card-header { padding: 1.1rem 1.5rem; background: rgba(255,255,255,0.01); border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; gap: 0.75rem; }
+.form-card-header h3, .danger-card-header h3 { font-size: 0.85rem; font-weight: 800; color: white; margin: 0; text-transform: uppercase; letter-spacing: 0.5px; }
+.form-card-body, .danger-card-body { padding: 1.5rem; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.field-group { display: flex; flex-direction: column; gap: 0.5rem; }
+.field-group label { font-size: 0.8rem; font-weight: 700; color: #999; }
+.profile-input { background: #1a1a1c; border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 0.75rem 1rem; color: white; font-size: 0.9rem; transition: 0.2s; }
+.profile-input:focus { border-color: var(--accent); background: #202022; outline: none; }
+.btn-save { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--accent); color: white; padding: 0.85rem 2rem; border-radius: 12px; font-weight: 800; font-size: 0.9rem; border: none; cursor: pointer; transition: 0.2s; }
+.btn-save:hover { transform: translateY(-2px); box-shadow: 0 8px 15px rgba(124, 92, 255, 0.2); }
+
+/* Table History Compact */
+.orders-table { width: 100%; border-collapse: collapse; }
+.orders-table th { padding: 1rem; font-size: 0.7rem; color: #555; border-bottom: 1px solid rgba(255,255,255,0.05); text-transform: uppercase; text-align: left; }
+.orders-table td { padding: 1.25rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.03); font-size: 0.85rem; color: #eee; }
+.order-row.interactive-row { cursor: pointer; transition: background 0.2s; }
+.order-row.interactive-row:hover { background: rgba(255,255,255,0.04); }
+.order-id { font-family: monospace; font-weight: 800; color: var(--accent); }
+.status-badge { padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 800; }
+.row-indicator { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #666; display: flex; align-items: center; justify-content: center; transition: 0.2s; margin: 0 auto; }
+.order-row:hover .row-indicator { background: var(--accent); border-color: var(--accent); color: white; transform: scale(1.1); }
+
+/* Modal Compact */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 4000; padding: 1rem; }
+.modal-content { background: #0c0c0e; border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; width: 100%; max-width: 460px; max-height: 85vh; overflow: hidden; display: flex; flex-direction: column; }
+.modal-header { padding: 1rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+.modal-header h3 { font-size: 1rem; font-weight: 900; margin: 0; color: white; }
+.modal-close { background: transparent; border: none; color: #777; font-size: 1.25rem; cursor: pointer; }
+.modal-body { padding: 1.25rem; overflow-y: auto; }
+
+.detail-summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.summary-item-mini label { display: block; font-size: 0.6rem; color: #555; text-transform: uppercase; font-weight: 800; margin-bottom: 0.15rem; }
+.summary-item-mini span { font-size: 0.85rem; color: white; font-weight: 700; }
+
+.info-details-box-compact { padding: 1rem; background: rgba(255,255,255,0.02); border-left: 3px solid var(--accent); border-radius: 4px; }
+.info-row-mini { display: flex; gap: 0.75rem; margin-bottom: 0.4rem; font-size: 0.8rem; }
+.info-row-mini label { flex: 0 0 65px; color: #666; font-weight: 700; }
+.info-row-mini span { color: #eee; }
+
+.detail-table-compact { width: 100%; border-collapse: collapse; }
+.detail-table-compact th { padding: 0.5rem 0.25rem; text-align: left; font-size: 0.65rem; color: #555; text-transform: uppercase; border-bottom: 1px solid rgba(255,255,255,0.05); }
+.detail-table-compact td { padding: 0.6rem 0.25rem; border-bottom: 1px solid rgba(255,255,255,0.03); color: white; font-size: 0.8rem; }
+.modal-total-bar-compact { display: flex; justify-content: flex-end; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: rgba(124,92,255,0.04); border-radius: 10px; font-weight: 800; }
+.total-value { font-size: 1.1rem; }
+
+.btn-danger-outline { 
+    width: 100%; padding: 1rem; background: rgba(255, 78, 78, 0.02); 
+    border: 1px solid rgba(255, 78, 78, 0.15); color: #ff4e4e; 
+    border-radius: 12px; cursor: pointer; font-weight: 800; font-size: 0.85rem; 
+    transition: all 0.2s; text-transform: uppercase; letter-spacing: 0.5px;
+}
+.btn-danger-outline:hover { background: #ff4e4e; color: white; border-color: #ff4e4e; box-shadow: 0 4px 12px rgba(255, 78, 78, 0.2); }
+
+.small { font-size: 0.8rem; }
+.text-muted { color: #8a8a8e; }
+.text-accent { color: var(--accent); }
+.text-right { text-align: right; }
+.text-center { text-align: center; }
+.font-bold { font-weight: 700; }
+.mb-4 { margin-bottom: 1.5rem; }
+.mb-5 { margin-bottom: 3rem; }
+.mt-5 { margin-top: 3rem; }
+.italic { font-style: italic; }
+
+.modal-loader { text-align: center; padding: 2rem; }
+.spinner { width: 24px; height: 24px; border: 2px solid rgba(124,92,255,0.1); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 0.5rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@media (max-width: 600px) {
+    .profile-header { flex-direction: column; text-align: center; }
+    .form-row { grid-template-columns: 1fr; }
+    .hide-mobile { display: none; }
+    .modal-content { max-height: 100vh; border-radius: 0; }
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Pestañas
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            
+            btn.classList.add('active');
+            const target = 'tab-' + btn.getAttribute('data-tab');
+            const targetEl = document.getElementById(target);
+            if(targetEl) targetEl.classList.add('active');
+        });
+    });
+
+    // Modal Details
+    const modal = document.getElementById('order-detail-modal');
+    const closeModal = document.getElementById('close-modal');
+    const rows = document.querySelectorAll('.order-row.interactive-row');
+
+    rows.forEach(row => {
+        row.addEventListener('click', async () => {
+            const id = row.dataset.id;
+            modal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            // ... resto de la lógica igual ...
+            document.getElementById('modal-loading').style.display = 'block';
+            document.getElementById('modal-data').style.display = 'none';
+            document.getElementById('modal-order-id').textContent = '#' + String(id).padStart(5, '0');
+            
+            try {
+                const res = await fetch(`/compra/${id}/detalle/`);
+                const data = await res.json();
+                if(data.ok) {
+                    document.getElementById('modal-order-date').textContent = data.fecha;
+                    document.getElementById('modal-order-method').textContent = data.metodo_pago;
+                    document.getElementById('modal-client-name').textContent = data.info_cliente.nombre;
+                    document.getElementById('modal-client-address').textContent = data.info_cliente.envio;
+                    document.getElementById('modal-client-phone').textContent = data.info_cliente.telefono;
+                    
+                    const notesCont = document.getElementById('modal-client-notes-container');
+                    if(data.info_cliente.notas_cliente) {
+                        document.getElementById('modal-client-notes').textContent = data.info_cliente.notas_cliente;
+                        notesCont.style.display = 'block';
+                    } else { notesCont.style.display = 'none'; }
+                    
+                    const tbody = document.getElementById('modal-items-body');
+                    tbody.innerHTML = '';
+                    data.items.forEach(it => {
+                        tbody.innerHTML += `<tr><td>${it.nombre}</td><td class="text-center">×${it.cantidad}</td><td class="text-right font-bold">${it.subtotal}</td></tr>`;
+                    });
+                    document.getElementById('modal-order-total').textContent = data.total;
+                    document.getElementById('modal-loading').style.display = 'none';
+                    document.getElementById('modal-data').style.display = 'block';
+                }
+            } catch(e) {
+                console.error(e);
+                modal.style.display = 'none';
+                document.body.style.overflow = 'auto';
+            }
+        });
+    });
+
+    closeModal.onclick = () => { modal.style.display = 'none'; document.body.style.overflow = 'auto'; };
+    window.onclick = (e) => { if(e.target == modal) { modal.style.display = 'none'; document.body.style.overflow = 'auto'; } };
+});
+</script>
+{% endblock %}

@@ -36,7 +36,13 @@
             <p class="detail-description">{{ producto.descripcion }}</p>
             {% endif %}
 
-            <div class="detail-price">{{ producto.precio_formateado }}</div>
+            <div class="detail-price">
+                <span>{{ producto.precio_formateado }}</span>
+                {% if producto.en_oferta %}
+                <span class="price-old">{{ producto.precio_original_formateado }}</span>
+                <span class="sale-label">Oferta -{{ producto.ahorro_porcentaje }}%</span>
+                {% endif %}
+            </div>
 
             <div class="detail-stock">
                 <span class="stock-dot {% if producto.stock_bajo %}low{% elif not producto.tiene_stock %}out{% endif %}"></span>

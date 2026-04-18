@@ -1,6 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
     <link rel="stylesheet" href="{% static 'catalogo/css/style.css' %}">
     {% block extra_css %}{% endblock %}
 </head>
+
 <body>
     {% include "catalogo/_icons.html" %}
     {% csrf_token %}
@@ -17,7 +19,9 @@
     <nav class="navbar">
         <div class="navbar-inner">
             <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Menu">
-                <svg class="icon"><use xlink:href="#icon-menu"></use></svg>
+                <svg class="icon">
+                    <use xlink:href="#icon-menu"></use>
+                </svg>
             </button>
 
             <div class="navbar-group-left">
@@ -25,14 +29,19 @@
                     <span class="brand-x">X</span><span>Store</span>
                 </a>
                 <ul class="navbar-nav">
-                    <li><a href="{% url 'catalogo:index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
-                    <li><a href="{% url 'catalogo:catalogo' %}" class="{% if request.resolver_match.url_name == 'catalogo' %}active{% endif %}">Catálogo</a></li>
+                    <li><a href="{% url 'catalogo:index' %}"
+                            class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">Inicio</a></li>
+                    <li><a href="{% url 'catalogo:catalogo' %}"
+                            class="{% if request.resolver_match.url_name == 'catalogo' %}active{% endif %}">Catálogo</a>
+                    </li>
                 </ul>
             </div>
 
             <div class="nav-search" id="nav-search-container">
                 <div class="search-input-wrapper">
-                    <svg class="icon icon-sm"><use xlink:href="#icon-search"></use></svg>
+                    <svg class="icon icon-sm">
+                        <use xlink:href="#icon-search"></use>
+                    </svg>
                     <input type="text" id="live-search-input" placeholder="Buscar productos..." autocomplete="off">
                 </div>
                 <div class="search-results-dropdown" id="live-search-results"></div>
@@ -40,8 +49,15 @@
 
             <div class="navbar-group-right">
                 <div class="navbar-actions">
+                    <a href="{% url 'catalogo:perfil' %}" class="navbar-icon-btn" title="Mi Cuenta">
+                        <svg class="icon icon-sm">
+                            <use xlink:href="#icon-user"></use>
+                        </svg>
+                    </a>
                     <a href="{% url 'catalogo:ver_carrito' %}" class="btn-cart" id="btn-cart-nav">
-                        <svg class="icon"><use xlink:href="#icon-cart"></use></svg>
+                        <svg class="icon">
+                            <use xlink:href="#icon-cart"></use>
+                        </svg>
                         <span class="cart-badge" id="cart-badge">0</span>
                     </a>
                 </div>
@@ -57,23 +73,75 @@
                 <span class="brand-x">X</span><span>Store</span>
             </div>
             <button class="btn-close-sidebar" id="close-sidebar">
-                <svg class="icon icon-sm"><use xlink:href="#icon-plus"></use></svg>
+                <svg class="icon icon-sm">
+                    <use xlink:href="#icon-plus"></use>
+                </svg>
             </button>
         </div>
-        
+
         <div class="sidebar-content">
+            <div class="sidebar-section">
+                <h3 class="sidebar-label">Cuenta</h3>
+                <ul class="sidebar-nav">
+                    {% if request.user.is_authenticated %}
+                    <li>
+                        <a href="{% url 'catalogo:perfil' %}"
+                            class="{% if request.resolver_match.url_name == 'perfil' %}active{% endif %}">
+                            <svg class="icon icon-sm">
+                                <use xlink:href="#icon-user"></use>
+                            </svg>
+                            Mi Perfil ({{ request.user.name }})
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'catalogo:logout' %}" class="text-danger">
+                            <svg class="icon icon-sm">
+                                <use xlink:href="#icon-plus" style="transform: rotate(45deg);"></use>
+                            </svg>
+                            Cerrar Sesión
+                        </a>
+                    </li>
+                    {% else %}
+                    <li>
+                        <a href="{% url 'catalogo:login' %}"
+                            class="{% if request.resolver_match.url_name == 'login' %}active{% endif %}">
+                            <svg class="icon icon-sm">
+                                <use xlink:href="#icon-user"></use>
+                            </svg>
+                            Iniciar Sesión
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'catalogo:registro' %}"
+                            class="{% if request.resolver_match.url_name == 'registro' %}active{% endif %}">
+                            <svg class="icon icon-sm">
+                                <use xlink:href="#icon-user-plus"></use>
+                            </svg>
+                            Crear Cuenta
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+
             <div class="sidebar-section">
                 <h3 class="sidebar-label">Navegación</h3>
                 <ul class="sidebar-nav">
                     <li>
-                        <a href="{% url 'catalogo:index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">
-                            <svg class="icon icon-sm"><use xlink:href="#icon-home"></use></svg>
+                        <a href="{% url 'catalogo:index' %}"
+                            class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                            <svg class="icon icon-sm">
+                                <use xlink:href="#icon-home"></use>
+                            </svg>
                             Inicio
                         </a>
                     </li>
                     <li>
-                        <a href="{% url 'catalogo:catalogo' %}" class="{% if request.resolver_match.url_name == 'catalogo' %}active{% endif %}">
-                            <svg class="icon icon-sm"><use xlink:href="#icon-package"></use></svg>
+                        <a href="{% url 'catalogo:catalogo' %}"
+                            class="{% if request.resolver_match.url_name == 'catalogo' %}active{% endif %}">
+                            <svg class="icon icon-sm">
+                                <use xlink:href="#icon-package"></use>
+                            </svg>
                             Catálogo
                         </a>
                     </li>
@@ -87,7 +155,9 @@
                     {% for cat in global_categorias %}
                     <li>
                         <a href="{% url 'catalogo:catalogo' %}?categoria={{ cat.nombre }}">
-                            <svg class="icon icon-sm"><use xlink:href="#icon-grid"></use></svg>
+                            <svg class="icon icon-sm">
+                                <use xlink:href="#icon-grid"></use>
+                            </svg>
                             {{ cat.nombre }}
                             <span class="qty">{{ cat.total }}</span>
                         </a>
@@ -108,19 +178,31 @@
             <div class="footer-brand">
                 <span class="brand-x">X</span>Store
             </div>
-            <span class="footer-text">© 2026 XStore · Catálogo de productos</span>
+            
             <div class="footer-links">
                 <a href="{% url 'catalogo:index' %}">Inicio</a>
                 <a href="{% url 'catalogo:catalogo' %}">Catálogo</a>
-                <a href="{% url 'catalogo:ver_carrito' %}">Carrito</a>
+                <a href="{% url 'catalogo:sobre_nosotros' %}">Sobre Nosotros</a>
+                <a href="{% url 'catalogo:contactanos' %}">Contacto</a>
             </div>
+
+            <div class="footer-social">
+                <a href="https://github.com" target="_blank" title="GitHub">
+                    <svg class="icon icon-sm"><use xlink:href="#icon-github"></use></svg>
+                </a>
+                <a href="https://linkedin.com" target="_blank" title="LinkedIn">
+                    <svg class="icon icon-sm"><use xlink:href="#icon-linkedin"></use></svg>
+                </a>
+            </div>
+
+            <span class="footer-text">© 2026 XStore · Hecho con Pasión</span>
         </div>
     </footer>
 
     <script src="{% static 'catalogo/js/cart.js' %}"></script>
     <script src="{% static 'catalogo/js/search.js' %}"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const toggleBtn = document.getElementById('mobile-menu-toggle');
             const closeBtn = document.getElementById('close-sidebar');
             const sidebar = document.getElementById('mobile-sidebar');
@@ -139,4 +221,5 @@
     </script>
     {% block extra_js %}{% endblock %}
 </body>
+
 </html>

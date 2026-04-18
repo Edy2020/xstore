@@ -85,4 +85,9 @@ SESSION_SAVE_EVERY_REQUEST = True
 MEDIA_URL = '/media/'
 XSTOCK_STORAGE_ROOT = BASE_DIR.parent / 'xstock' / 'storage' / 'app' / 'public'
 
+AUTHENTICATION_BACKENDS = [
+    'catalogo.auth_backend.XStockBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

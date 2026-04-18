@@ -25,24 +25,50 @@
                         Datos del Cliente
                     </h3>
                     <div class="checkout-fields">
-                        <div class="field-group">
-                            <label for="nombre_cliente">Nombre completo</label>
-                            <input type="text" id="nombre_cliente" name="nombre_cliente" placeholder="Ej. Juan Pérez" required class="checkout-input">
+                        <div class="form-row">
+                            <div class="field-group">
+                                <label for="nombre_cliente">Nombre completo</label>
+                                <input type="text" id="nombre_cliente" name="nombre_cliente" value="{{ request.user.name|default:'' }}" placeholder="Ej. Juan Pérez" required class="checkout-input">
+                            </div>
+                            <div class="field-group">
+                                <label for="metodo_pago">Método de pago</label>
+                                <select id="metodo_pago" name="metodo_pago" class="checkout-input" required>
+                                    <option value="Efectivo">Efectivo</option>
+                                    <option value="Tarjeta de débito">Tarjeta de débito</option>
+                                    <option value="Tarjeta de crédito">Tarjeta de crédito</option>
+                                    <option value="Transferencia">Transferencia bancaria</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="field-group">
-                            <label for="metodo_pago">Método de pago</label>
-                            <select id="metodo_pago" name="metodo_pago" class="checkout-input" required>
-                                <option value="Efectivo">Efectivo</option>
-                                <option value="Tarjeta de débito">Tarjeta de débito</option>
-                                <option value="Tarjeta de crédito">Tarjeta de crédito</option>
-                                <option value="Transferencia">Transferencia bancaria</option>
-                            </select>
+
+                        <div class="form-row">
+                            <div class="field-group" style="flex: 2;">
+                                <label for="direccion">Dirección de entrega</label>
+                                <input type="text" id="direccion" name="direccion" value="{{ perfil.direccion|default:'' }}" placeholder="Calle y número" required class="checkout-input">
+                            </div>
                         </div>
+
+                        <div class="form-row">
+                            <div class="field-group">
+                                <label for="ciudad">Ciudad</label>
+                                <input type="text" id="ciudad" name="ciudad" value="{{ perfil.ciudad|default:'' }}" placeholder="Ciudad" required class="checkout-input">
+                            </div>
+                            <div class="field-group">
+                                <label for="telefono">Teléfono</label>
+                                <input type="text" id="telefono" name="telefono" value="{{ perfil.telefono|default:'' }}" placeholder="+56 9..." required class="checkout-input">
+                            </div>
+                        </div>
+
                         <div class="field-group">
-                            <label for="notas">Notas del pedido</label>
-                            <textarea id="notas" name="notas" placeholder="Instrucciones de entrega o notas adicionales..." rows="3" class="checkout-input"></textarea>
+                            <label for="notas">Notas adicionales (opcional)</label>
+                            <textarea id="notas" name="notas" placeholder="Instrucciones de entrega o notas adicionales..." rows="2" class="checkout-input"></textarea>
                         </div>
                     </div>
+
+                    <style>
+                        .form-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
+                        .form-row .field-group { flex: 1; min-width: 200px; }
+                    </style>
                 </div>
 
                 <div class="checkout-section">

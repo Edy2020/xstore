@@ -2,6 +2,9 @@
 <div class="product-card animate-in">
     <a href="{% url 'catalogo:detalle' producto.id %}">
         <div class="product-image">
+            {% if producto.en_oferta %}
+            <span class="badge-sale">OFERTA -{{ producto.ahorro_porcentaje }}%</span>
+            {% endif %}
             {% if producto.stock_bajo %}
             <span class="product-badge badge-stock-low">Stock bajo</span>
             {% elif not producto.tiene_stock %}
@@ -23,7 +26,12 @@
         </h3>
         <div class="product-footer">
             <div>
-                <span class="product-price">{{ producto.precio_formateado }}</span>
+                <div class="price-group">
+                    <span class="product-price">{{ producto.precio_formateado }}</span>
+                    {% if producto.en_oferta %}
+                    <span class="price-old">{{ producto.precio_original_formateado }}</span>
+                    {% endif %}
+                </div>
                 <div class="product-stock {% if producto.stock_bajo %}low{% endif %}">
                     {% if producto.tiene_stock %}
                         {{ producto.stock }} dispon.
