@@ -1,4 +1,4 @@
-from .models import Productos
+from .models import Productos, Favoritos
 from django.db.models import Count
 
 def global_categories(request):
@@ -24,3 +24,13 @@ def global_categories(request):
     return {
         'global_categorias': categorias
     }
+
+def user_favoritos(request):
+    """
+    Retorna una lista de IDs de productos que el usuario tiene en favoritos
+    para marcarlos visualmente en las tarjetas.
+    """
+    if request.user.is_authenticated:
+        favoritos_ids = Favoritos.objects.filter(user=request.user).values_list('producto_id', flat=True)
+        return {'favoritos_ids': list(favoritos_ids)}
+    return {'favoritos_ids': []}

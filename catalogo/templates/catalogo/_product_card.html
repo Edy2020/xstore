@@ -17,6 +17,14 @@
                 <svg class="icon"><use xlink:href="#icon-package"></use></svg>
             </div>
             {% endif %}
+            
+            <button class="btn-favorite js-toggle-favorite {% if producto.id in favoritos_ids %}active{% endif %}" 
+                    data-product-id="{{ producto.id }}" 
+                    title="Añadir a favoritos">
+                <svg class="icon icon-sm">
+                    <use xlink:href="#icon-heart{% if producto.id in favoritos_ids %}-filled{% endif %}"></use>
+                </svg>
+            </button>
         </div>
     </a>
     <div class="product-info">
@@ -25,7 +33,7 @@
             <a href="{% url 'catalogo:detalle' producto.id %}">{{ producto.nombre }}</a>
         </h3>
         <div class="product-footer">
-            <div>
+            <div class="product-price-block">
                 <div class="price-group">
                     <span class="product-price">{{ producto.precio_formateado }}</span>
                     {% if producto.en_oferta %}
@@ -34,19 +42,21 @@
                 </div>
                 <div class="product-stock {% if producto.stock_bajo %}low{% endif %}">
                     {% if producto.tiene_stock %}
-                        {{ producto.stock }} dispon.
+                        {{ producto.stock }} unidades
                     {% else %}
-                        Sin stock
+                        Agotado
                     {% endif %}
                 </div>
             </div>
             {% if producto.tiene_stock %}
-            <button class="btn-add-cart js-add-cart" data-product-id="{{ producto.id }}">
-                <svg class="icon icon-sm"><use xlink:href="#icon-plus"></use></svg>
+            <button class="btn-add-cart js-add-cart" data-product-id="{{ producto.id }}" aria-label="Añadir al carrito">
+                <svg class="icon icon-sm"><use xlink:href="#icon-cart"></use></svg>
                 <span>Añadir</span>
             </button>
             {% else %}
-            <button class="btn-add-cart" disabled>Agotado</button>
+            <button class="btn-add-cart btn-disabled" disabled>
+                <span>Sin Stock</span>
+            </button>
             {% endif %}
         </div>
     </div>

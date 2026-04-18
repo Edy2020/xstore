@@ -49,11 +49,55 @@
 
             <div class="navbar-group-right">
                 <div class="navbar-actions">
-                    <a href="{% url 'catalogo:perfil' %}" class="navbar-icon-btn" title="Mi Cuenta">
-                        <svg class="icon icon-sm">
-                            <use xlink:href="#icon-user"></use>
-                        </svg>
-                    </a>
+                    <div class="navbar-item-dropdown">
+                        <button class="navbar-icon-btn" id="profile-dropdown-toggle" title="Mi Cuenta">
+                            <svg class="icon">
+                                <use xlink:href="#icon-user"></use>
+                            </svg>
+                        </button>
+                        <div class="dropdown-menu" id="profile-dropdown-menu">
+                            {% if request.user.is_authenticated %}
+                            <a href="{% url 'catalogo:perfil' %}" class="dropdown-user-info">
+                                <div class="dropdown-user-avatar">
+                                    <svg class="icon">
+                                        <use xlink:href="#icon-user"></use>
+                                    </svg>
+                                </div>
+                                <div class="dropdown-user-details">
+                                    <span class="dropdown-user-name">{{ request.user.name|default:request.user.email
+                                        }}</span>
+                                    <span class="dropdown-user-label">Ver Perfil</span>
+                                </div>
+                            </a>
+                            <div class="dropdown-divider"></div>
+                            <a href="{% url 'catalogo:perfil' %}?tab=favoritos" class="dropdown-link">
+                                <svg class="icon icon-sm">
+                                    <use xlink:href="#icon-heart"></use>
+                                </svg>
+                                Mis Favoritos
+                            </a>
+                            <a href="{% url 'catalogo:logout' %}" class="dropdown-link logout">
+                                <svg class="icon icon-sm">
+                                    <use xlink:href="#icon-plus" style="transform: rotate(45deg);"></use>
+                                </svg>
+                                Cerrar Sesión
+                            </a>
+                            {% else %}
+                            <a href="{% url 'catalogo:login' %}" class="dropdown-link">
+                                <svg class="icon icon-sm">
+                                    <use xlink:href="#icon-user"></use>
+                                </svg>
+                                Iniciar Sesión
+                            </a>
+                            <a href="{% url 'catalogo:registro' %}" class="dropdown-link">
+                                <svg class="icon icon-sm">
+                                    <use xlink:href="#icon-user-plus"></use>
+                                </svg>
+                                Crear Cuenta
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
                     <a href="{% url 'catalogo:ver_carrito' %}" class="btn-cart" id="btn-cart-nav">
                         <svg class="icon">
                             <use xlink:href="#icon-cart"></use>
@@ -91,6 +135,15 @@
                                 <use xlink:href="#icon-user"></use>
                             </svg>
                             Mi Perfil ({{ request.user.name }})
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{% url 'catalogo:perfil' %}?tab=favoritos"
+                            class="{% if request.resolver_match.url_name == 'perfil' and request.GET.tab == 'favoritos' %}active{% endif %}">
+                            <svg class="icon icon-sm">
+                                <use xlink:href="#icon-heart"></use>
+                            </svg>
+                            Mis Favoritos
                         </a>
                     </li>
                     <li>
@@ -178,7 +231,7 @@
             <div class="footer-brand">
                 <span class="brand-x">X</span>Store
             </div>
-            
+
             <div class="footer-links">
                 <a href="{% url 'catalogo:index' %}">Inicio</a>
                 <a href="{% url 'catalogo:catalogo' %}">Catálogo</a>
@@ -187,11 +240,15 @@
             </div>
 
             <div class="footer-social">
-                <a href="https://github.com" target="_blank" title="GitHub">
-                    <svg class="icon icon-sm"><use xlink:href="#icon-github"></use></svg>
+                <a href="https://github.com/Edy2020" target="_blank" title="GitHub">
+                    <svg class="icon icon-sm">
+                        <use xlink:href="#icon-github"></use>
+                    </svg>
                 </a>
-                <a href="https://linkedin.com" target="_blank" title="LinkedIn">
-                    <svg class="icon icon-sm"><use xlink:href="#icon-linkedin"></use></svg>
+                <a href="https://www.linkedin.com/in/edisonvm/" target="_blank" title="LinkedIn">
+                    <svg class="icon icon-sm">
+                        <use xlink:href="#icon-linkedin"></use>
+                    </svg>
                 </a>
             </div>
 
@@ -217,6 +274,76 @@
             toggleBtn?.addEventListener('click', toggleSidebar);
             closeBtn?.addEventListener('click', toggleSidebar);
             overlay?.addEventListener('click', toggleSidebar);
+
+            // Perfil Dropdown
+            const profileToggle = document.getElementById('profile-dropdown-toggle');
+            const profileMenu = document.getElementById('profile-dropdown-menu');
+
+            profileToggle?.addEventListener('click', function (e) {
+                e.stopPropagation();
+                profileMenu.classList.toggle('active');
+            });
+
+            document.addEventListener('click', function (e) {
+                if (!profileMenu?.contains(e.target) && !profileToggle?.contains(e.target)) {
+                    profileMenu?.classList.remove('active');
+                }
+            });
+
+            // Favoritos AJAX Toggle
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+
+            document.addEventListener('click', async function (e) {
+                const favBtn = e.target.closest('.js-toggle-favorite');
+                if (!favBtn) return;
+
+                e.preventDefault();
+                e.stopPropagation();
+
+                const productId = favBtn.dataset.productId;
+                const icon = favBtn.querySelector('use');
+
+                try {
+                    const response = await fetch(`/favoritos/toggle/${productId}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    if (response.status === 401) {
+                        window.location.href = "{% url 'catalogo:login' %}?next=" + window.location.pathname;
+                        return;
+                    }
+
+                    const data = await response.json();
+                    if (data.ok) {
+                        if (data.action === 'added') {
+                            favBtn.classList.add('active');
+                            icon.setAttribute('xlink:href', '#icon-heart-filled');
+                        } else {
+                            favBtn.classList.remove('active');
+                            icon.setAttribute('xlink:href', '#icon-heart');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error toggling favorite:', error);
+                }
+            });
         });
     </script>
     {% block extra_js %}{% endblock %}

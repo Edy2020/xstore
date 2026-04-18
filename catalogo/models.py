@@ -209,3 +209,19 @@ class Perfiles(models.Model):
 
     def __str__(self):
         return f"Perfil de {self.user.name}"
+
+
+class Favoritos(models.Model):
+    user = models.ForeignKey('Users', on_delete=models.CASCADE, related_name='mis_favoritos', db_constraint=False)
+    producto = models.ForeignKey('Productos', on_delete=models.CASCADE, related_name='usuarios_interesados', db_constraint=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'favoritos'
+        unique_together = ('user', 'producto')
+        verbose_name = 'Favorito'
+        verbose_name_plural = 'Favoritos'
+
+    def __str__(self):
+        return f"{self.user.name} - {self.producto.nombre}"
+

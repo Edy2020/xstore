@@ -7,7 +7,7 @@ from django.utils import timezone
 from django.contrib.auth import login, logout, authenticate
 from django.contrib import messages
 import bcrypt
-from .models import Productos, Ventas, DetalleVentas, LogActividades, Users, Roles, Perfiles
+from .models import Productos, Ventas, DetalleVentas, LogActividades, Users, Roles, Perfiles, Favoritos
 
 
 def _format_price(value):
@@ -442,6 +442,10 @@ def perfil_usuario(request):
             'created_at': v.created_at,
         })
     
+    # Obtenemos productos favoritos
+    favoritos_qs = Favoritos.objects.filter(user=request.user).select_related('producto')
+    favoritos = [f.producto for f in favoritos_qs]
+    
     if request.method == 'POST':
         request.user.name = request.POST.get('nombre')
         request.user.save()
@@ -456,7 +460,8 @@ def perfil_usuario(request):
         
     return render(request, 'catalogo/perfil.html', {
         'perfil': perfil,
-        'ventas': ventas
+        'ventas': ventas,
+        'favoritos': favoritos
     })
 
 
@@ -645,3 +650,21 @@ def confirmar_compra(request):
             'exito': False,
             'error': str(e),
         })
+
+def toggle_favorito(request, producto_id):
+    if not request.user.is_authenticated:
+        return JsonResponse({'ok': False, 'error': 'Debes iniciar sesión para guardar favoritos'}, status=401)
+    
+    try:
+        producto = get_object_or_404(Productos, id=producto_id)
+        favorito, created = Favoritos.objects.get_or_create(user=request.user, producto=producto)
+        
+        if not created:
+            favorito.delete()
+            action = 'removed'
+        else:
+            action = 'added'
+            
+        return JsonResponse({'ok': True, 'action': action})
+    except Exception as e:
+        return JsonResponse({'ok': False, 'error': str(e)}, status=500)

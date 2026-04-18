@@ -37,19 +37,23 @@
 
         <!-- Navegación por Pestañas -->
         <div class="profile-tabs animate-in" style="animation-delay: 0.1s;">
-            <button class="tab-btn active" data-tab="datos">
+            <button class="tab-btn {% if not request.GET.tab or request.GET.tab == 'datos' %}active{% endif %}" data-tab="datos">
                 <svg class="icon icon-xs"><use xlink:href="#icon-user"></use></svg>
                 Mis Datos
             </button>
-            <button class="tab-btn" data-tab="pedidos">
+            <button class="tab-btn {% if request.GET.tab == 'pedidos' %}active{% endif %}" data-tab="pedidos">
                 <svg class="icon icon-xs"><use xlink:href="#icon-package"></use></svg>
                 Mis Pedidos
+            </button>
+            <button class="tab-btn {% if request.GET.tab == 'favoritos' %}active{% endif %}" data-tab="favoritos">
+                <svg class="icon icon-xs"><use xlink:href="#icon-heart"></use></svg>
+                Mis Favoritos
             </button>
         </div>
 
         <div class="profile-grid">
             <!-- Pestaña: Mis Datos -->
-            <div id="tab-datos" class="tab-content active animate-in" style="animation-delay: 0.2s;">
+            <div id="tab-datos" class="tab-content {% if not request.GET.tab or request.GET.tab == 'datos' %}active{% endif %} animate-in" style="animation-delay: 0.2s;">
                 <div class="profile-main-card">
                     <form method="POST">
                         {% csrf_token %}
@@ -123,7 +127,7 @@
             </div>
 
             <!-- Pestaña: Mis Pedidos -->
-            <div id="tab-pedidos" class="tab-content animate-in" style="animation-delay: 0.2s;">
+            <div id="tab-pedidos" class="tab-content {% if request.GET.tab == 'pedidos' %}active{% endif %} animate-in" style="animation-delay: 0.2s;">
                 <div class="orders-card">
                     <div class="form-card-header">
                         <svg class="icon icon-xs text-accent"><use xlink:href="#icon-grid"></use></svg>
@@ -165,6 +169,37 @@
                         <div class="empty-orders">
                             <p class="text-muted">No tienes pedidos aún.</p>
                             <a href="{% url 'catalogo:catalogo' %}" class="btn btn-save btn-sm mt-3">Ir a la tienda</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pestaña: Mis Favoritos -->
+            <div id="tab-favoritos" class="tab-content {% if request.GET.tab == 'favoritos' %}active{% endif %} animate-in" style="animation-delay: 0.2s;">
+                <div class="orders-card">
+                    <div class="form-card-header">
+                        <svg class="icon icon-xs text-accent"><use xlink:href="#icon-heart"></use></svg>
+                        <h3>Productos Favoritos</h3>
+                    </div>
+                    <div class="form-card-body">
+                        {% if favoritos %}
+                        <div class="products-grid">
+                            {% for producto in favoritos %}
+                                {% include "catalogo/_product_card.html" with producto=producto %}
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="empty-state-premium">
+                            <div class="empty-icon-container">
+                                <svg class="icon"><use xlink:href="#icon-heart"></use></svg>
+                            </div>
+                            <h3>Tu lista está vacía</h3>
+                            <p class="text-muted">Guarda los productos que más te gusten para tenerlos siempre a mano.</p>
+                            <a href="{% url 'catalogo:catalogo' %}" class="btn btn-explore">
+                                <span>Explorar Catálogo</span>
+                                <svg class="icon icon-xs"><use xlink:href="#icon-arrow-right"></use></svg>
+                            </a>
                         </div>
                         {% endif %}
                     </div>
@@ -240,8 +275,36 @@
 .btn-logout { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.6rem 1.1rem; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; color: #ccc; font-weight: 700; font-size: 0.8rem; text-decoration: none; transition: 0.2s; }
 .btn-logout:hover { color: #ff4e4e; border-color: #ff4e4e; background: rgba(255,78,78,0.05); }
 
-.profile-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); }
-.tab-btn { display: flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.25rem; background: transparent; border: none; border-bottom: 3px solid transparent; color: #777; font-weight: 700; font-size: 0.9rem; cursor: pointer; transition: 0.2s; position: relative; bottom: -2px; }
+.profile-tabs { 
+    display: flex; 
+    gap: 0.5rem; 
+    margin-bottom: 2rem; 
+    border-bottom: 1px solid rgba(255,255,255,0.05); 
+    overflow-x: auto; 
+    scrollbar-width: none; 
+    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+}
+.profile-tabs::-webkit-scrollbar { display: none; }
+
+.tab-btn { 
+    display: flex; 
+    align-items: center; 
+    gap: 0.5rem; 
+    padding: 0.75rem 1rem; 
+    background: transparent; 
+    border: none; 
+    border-bottom: 3px solid transparent; 
+    color: #777; 
+    font-weight: 700; 
+    font-size: 0.85rem; 
+    cursor: pointer; 
+    transition: 0.2s; 
+    position: relative; 
+    bottom: -2px; 
+    white-space: nowrap;
+    flex-shrink: 0;
+}
 .tab-btn:hover { color: white; }
 .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
 
@@ -271,6 +334,9 @@
 .status-badge { padding: 0.25rem 0.6rem; border-radius: 20px; font-size: 0.7rem; font-weight: 800; }
 .row-indicator { width: 32px; height: 32px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.1); background: transparent; color: #666; display: flex; align-items: center; justify-content: center; transition: 0.2s; margin: 0 auto; }
 .order-row:hover .row-indicator { background: var(--accent); border-color: var(--accent); color: white; transform: scale(1.1); }
+
+.orders-table-wrapper { width: 100%; overflow-x: auto; scrollbar-width: thin; -webkit-overflow-scrolling: touch; }
+
 
 /* Modal Compact */
 .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; z-index: 4000; padding: 1rem; }
@@ -319,10 +385,14 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 600px) {
-    .profile-header { flex-direction: column; text-align: center; }
-    .form-row { grid-template-columns: 1fr; }
+    .profile-header { flex-direction: column; text-align: center; gap: 1rem; align-items: center; }
+    .profile-header-content { flex-direction: column; }
+    .profile-header-actions { width: 100%; display: flex; justify-content: center; }
+    .btn-logout { width: 100%; max-width: 200px; justify-content: center; }
+    .form-row { grid-template-columns: 1fr; gap: 1rem; }
     .hide-mobile { display: none; }
     .modal-content { max-height: 100vh; border-radius: 0; }
+    .container-profile { padding: 0 1rem; }
 }
 </style>
 

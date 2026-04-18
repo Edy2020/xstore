@@ -25,5 +25,6 @@ urlpatterns = [
     path('logout/', views.logout_usuario, name='logout'),
     path('perfil/', views.perfil_usuario, name='perfil'),
     path('perfil/eliminar/', views.eliminar_cuenta, name='eliminar_cuenta'),
+    path('favoritos/toggle/<int:producto_id>/', views.toggle_favorito, name='toggle_favorito'),
     path('compra/<int:venta_id>/detalle/', views.detalle_compra_api, name='detalle_compra_api'),
 ]
