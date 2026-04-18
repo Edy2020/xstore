@@ -19,14 +19,18 @@
             <img src="{{ producto.imagen_url }}" alt="{{ producto.nombre }}" class="detail-img">
             {% else %}
             <div class="detail-img-placeholder">
-                <svg class="icon"><use xlink:href="#icon-package"></use></svg>
+                <svg class="icon">
+                    <use xlink:href="#icon-package"></use>
+                </svg>
             </div>
             {% endif %}
         </div>
 
         <div class="detail-info">
             <div class="detail-category">
-                <svg class="icon icon-sm"><use xlink:href="#icon-tag"></use></svg>
+                <svg class="icon icon-sm">
+                    <use xlink:href="#icon-tag"></use>
+                </svg>
                 {{ producto.categoria|default:"Producto" }}
             </div>
 
@@ -45,12 +49,13 @@
             </div>
 
             <div class="detail-stock">
-                <span class="stock-dot {% if producto.stock_bajo %}low{% elif not producto.tiene_stock %}out{% endif %}"></span>
+                <span
+                    class="stock-dot {% if producto.stock_bajo %}low{% elif not producto.tiene_stock %}out{% endif %}"></span>
                 <span class="{% if not producto.tiene_stock %}out{% elif producto.stock_bajo %}low{% endif %}">
                     {% if producto.tiene_stock %}
-                        {{ producto.stock }} unidades disponibles
+                    {{ producto.stock }} unidades disponibles
                     {% else %}
-                        Producto agotado
+                    Producto agotado
                     {% endif %}
                 </span>
             </div>
@@ -59,28 +64,27 @@
             <div class="detail-cart-form">
                 <div class="qty-selector">
                     <button type="button" onclick="changeDetailQty(-1)">
-                        <svg class="icon icon-sm"><use xlink:href="#icon-minus"></use></svg>
+                        <svg class="icon icon-sm">
+                            <use xlink:href="#icon-minus"></use>
+                        </svg>
                     </button>
-                    <input type="number" id="qty-{{ producto.id }}" value="1" min="1" max="{{ producto.stock }}" readonly>
+                    <input type="number" id="qty-{{ producto.id }}" value="1" min="1" max="{{ producto.stock }}"
+                        readonly>
                     <button type="button" onclick="changeDetailQty(1)">
-                        <svg class="icon icon-sm"><use xlink:href="#icon-plus"></use></svg>
+                        <svg class="icon icon-sm">
+                            <use xlink:href="#icon-plus"></use>
+                        </svg>
                     </button>
                 </div>
-                <button class="btn btn-primary detail-add-btn js-add-cart"
-                        data-product-id="{{ producto.id }}">
-                    <svg class="icon icon-sm"><use xlink:href="#icon-cart"></use></svg>
+                <button class="btn btn-primary detail-add-btn js-add-cart" data-product-id="{{ producto.id }}">
+                    <svg class="icon icon-sm">
+                        <use xlink:href="#icon-cart"></use>
+                    </svg>
                     Añadir al carrito
                 </button>
             </div>
             {% else %}
             <button class="btn btn-secondary" disabled style="opacity: 0.5;">Agotado</button>
-            {% endif %}
-
-            {% if producto.proveedor %}
-            <div style="padding-top: 1rem; border-top: 1px solid var(--border-color); color: var(--text-muted); font-size: 0.8rem; display: flex; align-items: center; gap: 0.5rem;">
-                <svg class="icon icon-sm"><use xlink:href="#icon-user"></use></svg>
-                Proveedor: {{ producto.proveedor.nombre }}
-            </div>
             {% endif %}
         </div>
     </div>
@@ -93,7 +97,7 @@
     </div>
     <div class="products-grid">
         {% for producto in relacionados %}
-            {% include "catalogo/_product_card.html" with producto=producto %}
+        {% include "catalogo/_product_card.html" with producto=producto %}
         {% endfor %}
     </div>
 </div>
@@ -102,14 +106,14 @@
 
 {% block extra_js %}
 <script>
-function changeDetailQty(delta) {
-    const input = document.querySelector('[id^="qty-"]');
-    if (!input) return;
-    let val = parseInt(input.value) + delta;
-    const max = parseInt(input.max) || 99;
-    if (val < 1) val = 1;
-    if (val > max) val = max;
-    input.value = val;
-}
+    function changeDetailQty(delta) {
+        const input = document.querySelector('[id^="qty-"]');
+        if (!input) return;
+        let val = parseInt(input.value) + delta;
+        const max = parseInt(input.max) || 99;
+        if (val < 1) val = 1;
+        if (val > max) val = max;
+        input.value = val;
+    }
 </script>
 {% endblock %}
