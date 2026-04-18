@@ -16,6 +16,20 @@
     {% include "catalogo/_icons.html" %}
     {% csrf_token %}
 
+    <div class="bg-energy-circuit" aria-hidden="true">
+        <svg class="circuit-layer" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+            <!-- Energy Paths - Original Circuit Wireframe -->
+            <path class="circuit-path p-1" d="M0,150 L300,150 L400,250 L750,250 L850,350 L1000,350" />
+            <path class="circuit-path p-2" d="M1000,50 L850,50 L750,150 L400,150 L300,250 L0,250" />
+            <path class="circuit-path p-3" d="M150,0 L150,400 L250,500 L250,1000" />
+            <path class="circuit-path p-4" d="M850,1000 L850,600 L750,500 L750,0" />
+            <path class="circuit-path p-5" d="M0,850 L350,850 L550,650 L1000,650" />
+            <path class="circuit-path p-6" d="M1000,450 L750,450 L550,650 L0,650" />
+            <path class="circuit-path p-7" d="M350,0 L350,200 L650,500 L650,1000" />
+            <path class="circuit-path p-8" d="M0,550 L450,550 L650,750 L1000,750" />
+        </svg>
+    </div>
+
     <nav class="navbar">
         <div class="navbar-inner">
             <button class="mobile-menu-btn" id="mobile-menu-toggle" aria-label="Menu">
