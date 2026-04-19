@@ -77,8 +77,7 @@
                                     </svg>
                                 </div>
                                 <div class="dropdown-user-details">
-                                    <span class="dropdown-user-name">{{ request.user.name|default:request.user.email
-                                        }}</span>
+                                    <span class="dropdown-user-name">{{ user.name|default:user.email }}</span>
                                     <span class="dropdown-user-label">Ver Perfil</span>
                                 </div>
                             </a>
