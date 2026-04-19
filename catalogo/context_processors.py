@@ -16,9 +16,14 @@ def global_categories(request):
     categorias = []
     for cat in categorias_qs:
         if cat['categoria']:
+            # Obtener el último producto con imagen para esta categoría
+            p_img = Productos.objects.filter(categoria=cat['categoria'], estado='activo').exclude(imagen='').order_by('-id').first()
+            img_url = p_img.imagen_url if p_img else None
+            
             categorias.append({
                 'nombre': cat['categoria'],
                 'total': cat['total'],
+                'imagen': img_url
             })
             
     return {

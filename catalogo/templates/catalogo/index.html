@@ -40,16 +40,30 @@
                 </svg>
             </a>
         </div>
-        <div class="categories-grid">
+        <div class="categories-rhombus-grid">
             {% for cat in categorias %}
-            <a href="{% url 'catalogo:catalogo' %}?categoria={{ cat.categoria }}" class="category-card animate-in">
-                <div class="category-icon">
-                    <svg class="icon icon-lg">
-                        <use xlink:href="#icon-grid"></use>
-                    </svg>
+            <a href="{% url 'catalogo:catalogo' %}?categoria={{ cat.categoria }}" class="category-rhombus animate-in"
+                style="--idx: {{ forloop.counter0 }}">
+                <div class="rhombus-card">
+                    <div class="rhombus-image">
+                        {% if cat.imagen %}
+                        <img src="{{ cat.imagen }}" alt="{{ cat.categoria }}">
+                        {% else %}
+                        <div class="rhombus-placeholder">
+                            <svg class="icon">
+                                <use xlink:href="#icon-package"></use>
+                            </svg>
+                        </div>
+                        {% endif %}
+                        <div class="rhombus-overlay"></div>
+                    </div>
+                    <div class="rhombus-content">
+                        <div class="rhombus-details">
+                            <h3 class="rhombus-name">{{ cat.categoria }}</h3>
+                            <div class="rhombus-count">{{ cat.total }} Items</div>
+                        </div>
+                    </div>
                 </div>
-                <div class="category-name">{{ cat.categoria }}</div>
-                <div class="category-count">{{ cat.total }} item{{ cat.total|pluralize:"s" }}</div>
             </a>
             {% endfor %}
         </div>

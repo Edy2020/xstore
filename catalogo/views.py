@@ -44,15 +44,20 @@ def index(request):
         productos_activos
         .values('categoria')
         .annotate(total=Count('id'))
-        .order_by('-total')
+        .order_by('-total')[:6]
     )
 
     categorias = []
     for cat in categorias_qs:
         nombre = cat['categoria'] or 'Otros'
+        # Obtener el último producto añadido con imagen para esta categoría
+        p_img = productos_activos.filter(categoria=nombre).exclude(imagen='').order_by('-id').first()
+        img_url = p_img.imagen_url if p_img else None
+        
         categorias.append({
             'categoria': nombre,
             'total': cat['total'],
+            'imagen': img_url
         })
 
     productos_destacados = productos_activos.filter(stock__gt=0).order_by('-id')[:8]

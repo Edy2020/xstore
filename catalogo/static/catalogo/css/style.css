@@ -2240,25 +2240,11 @@ select.checkout-input {
 }
 
 @keyframes heartbeat {
-    0% {
-        transform: scale(1);
-    }
-
-    15% {
-        transform: scale(1.25);
-    }
-
-    30% {
-        transform: scale(1);
-    }
-
-    45% {
-        transform: scale(1.15);
-    }
-
-    60% {
-        transform: scale(1);
-    }
+    0% { transform: scale(1); }
+    15% { transform: scale(1.25); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.15); }
+    60% { transform: scale(1); }
 }
 
 .btn-favorite.active .icon {
@@ -2273,6 +2259,8 @@ select.checkout-input {
 .btn-favorite:active .icon {
     transform: scale(0.8);
 }
+
+
 
 /* Perfil Tab Favoritos */
 #tab-favoritos .products-grid {
@@ -2443,5 +2431,165 @@ select.checkout-input {
 
     .circuit-path {
         stroke-width: 1px;
+    }
+}
+
+
+/* ========== CATEGORIES RHOMBUS ========== */
+.categories-rhombus-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    padding: 3rem 0;
+    justify-content: center;
+}
+
+.category-rhombus {
+    width: 220px;
+    height: 380px;
+    position: relative;
+    text-decoration: none;
+    z-index: 1;
+    margin-left: -32px;
+}
+
+.category-rhombus:hover {
+    z-index: 10;
+}
+
+.rhombus-card {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    background: #000;
+    clip-path: polygon(15% 0%, 100% 0%, 85% 100%, 0% 100%);
+    overflow: hidden;
+    border-right: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.category-rhombus:hover .rhombus-card {
+    border-right-color: var(--accent);
+}
+
+
+.rhombus-image {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+}
+
+.rhombus-image img {
+    width: 150%;
+    height: 100%;
+    object-fit: cover;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    filter: none;
+    opacity: 0.9;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.categories-rhombus-grid:hover .rhombus-image img {
+    filter: grayscale(1) brightness(0.4);
+    opacity: 0.5;
+}
+
+.category-rhombus:hover .rhombus-image img {
+    filter: grayscale(0) brightness(1) contrast(1.1);
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.1);
+}
+
+
+.rhombus-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-elevated);
+    color: var(--text-muted);
+}
+
+.rhombus-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(0, 0, 0, 0) 40%, rgba(139, 92, 246, 0.4) 100%);
+    opacity: 0.3;
+    transition: opacity 0.4s;
+}
+
+.category-rhombus:hover .rhombus-overlay {
+    opacity: 0.6;
+}
+
+.rhombus-content {
+    position: absolute;
+    inset: 0;
+    padding: 2.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    pointer-events: none;
+}
+
+.rhombus-details {
+    padding: 0 5%;
+    max-width: 100%;
+    transition: transform 0.4s ease;
+    text-align: center;
+}
+
+.category-rhombus:hover .rhombus-details {
+    transform: none;
+}
+
+.rhombus-name {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 0.2rem;
+    white-space: nowrap;
+}
+
+.rhombus-count {
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 500;
+}
+
+@media (max-width: 992px) {
+    .category-rhombus {
+        width: 180px;
+        height: 320px;
+        margin-left: -28px;
+    }
+}
+
+@media (max-width: 600px) {
+    .categories-rhombus-grid {
+        gap: 0.5rem;
+        padding: 1.5rem 0;
+    }
+
+    .category-rhombus {
+        width: 46%;
+        height: 240px;
+        margin-left: 0;
+    }
+
+    .rhombus-name {
+        font-size: 1.2rem;
+    }
+
+    .rhombus-card {
+        clip-path: polygon(10% 0%, 100% 0%, 90% 100%, 0% 100%);
     }
 }
