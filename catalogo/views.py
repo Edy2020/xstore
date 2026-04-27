@@ -583,8 +583,9 @@ def confirmar_compra(request):
                 subtotal=0,
                 descuento_total=0,
                 total=0,
-                estado='completada',
+                estado='preparacion',
                 metodo_pago=metodo_pago,
+                origen='online',
                 notas=notas_final,
             )
             venta.save()

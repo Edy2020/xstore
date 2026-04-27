@@ -31,13 +31,8 @@
                                 <input type="text" id="nombre_cliente" name="nombre_cliente" value="{{ request.user.name|default:'' }}" placeholder="Ej. Juan Pérez" required class="checkout-input">
                             </div>
                             <div class="field-group">
-                                <label for="metodo_pago">Método de pago</label>
-                                <select id="metodo_pago" name="metodo_pago" class="checkout-input" required>
-                                    <option value="Efectivo">Efectivo</option>
-                                    <option value="Tarjeta de débito">Tarjeta de débito</option>
-                                    <option value="Tarjeta de crédito">Tarjeta de crédito</option>
-                                    <option value="Transferencia">Transferencia bancaria</option>
-                                </select>
+                                <label for="telefono">Teléfono</label>
+                                <input type="text" id="telefono" name="telefono" value="{{ perfil.telefono|default:'' }}" placeholder="+56 9..." required class="checkout-input">
                             </div>
                         </div>
 
@@ -46,16 +41,51 @@
                                 <label for="direccion">Dirección de entrega</label>
                                 <input type="text" id="direccion" name="direccion" value="{{ perfil.direccion|default:'' }}" placeholder="Calle y número" required class="checkout-input">
                             </div>
-                        </div>
-
-                        <div class="form-row">
-                            <div class="field-group">
+                            <div class="field-group" style="flex: 1;">
                                 <label for="ciudad">Ciudad</label>
                                 <input type="text" id="ciudad" name="ciudad" value="{{ perfil.ciudad|default:'' }}" placeholder="Ciudad" required class="checkout-input">
                             </div>
-                            <div class="field-group">
-                                <label for="telefono">Teléfono</label>
-                                <input type="text" id="telefono" name="telefono" value="{{ perfil.telefono|default:'' }}" placeholder="+56 9..." required class="checkout-input">
+                        </div>
+
+                        <div class="field-group" style="margin-bottom: 1.5rem;">
+                            <label style="margin-bottom: 0.75rem; display: block;">Selecciona un método de pago</label>
+                            <div class="payment-methods-grid">
+                                <label class="payment-method-card">
+                                    <input type="radio" name="metodo_pago" value="Tarjeta de débito" required checked>
+                                    <div class="pm-content">
+                                        <div class="pm-icon">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"></rect><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                        </div>
+                                        <div class="pm-info">
+                                            <div class="pm-title">Débito</div>
+                                            <div class="pm-desc">Pago inmediato</div>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="payment-method-card">
+                                    <input type="radio" name="metodo_pago" value="Tarjeta de crédito">
+                                    <div class="pm-content">
+                                        <div class="pm-icon">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 4H3a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h18a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2z"></path><line x1="1" y1="10" x2="23" y2="10"></line></svg>
+                                        </div>
+                                        <div class="pm-info">
+                                            <div class="pm-title">Crédito</div>
+                                            <div class="pm-desc">Cuotas disponibles</div>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="payment-method-card">
+                                    <input type="radio" name="metodo_pago" value="Transferencia">
+                                    <div class="pm-content">
+                                        <div class="pm-icon">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+                                        </div>
+                                        <div class="pm-info">
+                                            <div class="pm-title">Transferencia</div>
+                                            <div class="pm-desc">Validación manual</div>
+                                        </div>
+                                    </div>
+                                </label>
                             </div>
                         </div>
 
@@ -68,6 +98,66 @@
                     <style>
                         .form-row { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem; }
                         .form-row .field-group { flex: 1; min-width: 200px; }
+                        
+                        .payment-methods-grid {
+                            display: grid;
+                            grid-template-columns: repeat(3, 1fr);
+                            gap: 1rem;
+                        }
+                        
+                        @media (max-width: 640px) {
+                            .payment-methods-grid {
+                                grid-template-columns: 1fr;
+                            }
+                        }
+
+                        .payment-method-card {
+                            position: relative;
+                            cursor: pointer;
+                        }
+                        .payment-method-card input {
+                            position: absolute;
+                            opacity: 0;
+                            width: 0;
+                            height: 0;
+                        }
+                        .pm-content {
+                            padding: 1rem;
+                            background: var(--bg-card);
+                            border: 1px solid var(--border-color);
+                            border-radius: var(--radius-md);
+                            display: flex;
+                            align-items: center;
+                            gap: 1rem;
+                            transition: all var(--transition);
+                            height: 100%;
+                        }
+                        .pm-icon {
+                            width: 24px;
+                            height: 24px;
+                            color: var(--text-muted);
+                            transition: color var(--transition);
+                            flex-shrink: 0;
+                        }
+                        .pm-icon svg { width: 100%; height: 100%; }
+                        .pm-title { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
+                        .pm-desc { font-size: 0.75rem; color: var(--text-muted); white-space: nowrap; }
+
+                        .payment-method-card:hover .pm-content {
+                            border-color: var(--border-hover);
+                            background: var(--bg-card-hover);
+                        }
+                        .payment-method-card input:checked + .pm-content {
+                            border-color: var(--accent);
+                            background: var(--accent-dim);
+                            box-shadow: 0 0 0 1px var(--accent);
+                        }
+                        .payment-method-card input:checked + .pm-content .pm-icon {
+                            color: var(--accent);
+                        }
+                        .payment-method-card input:checked + .pm-content .pm-title {
+                            color: var(--accent-light);
+                        }
                     </style>
                 </div>
 
